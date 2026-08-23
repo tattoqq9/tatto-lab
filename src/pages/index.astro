@@ -1,0 +1,462 @@
+---
+const projects = [
+  {
+    title: "Guitar AI",
+    description: "自分のギターを高精度に切り抜くための専用AIを開発しています。",
+    status: "In Development",
+  },
+  {
+    title: "Agent Society",
+    description: "LLMエージェントが生活し、記憶や知識を世代を越えて継承する社会シミュレーション。",
+    status: "In Development",
+  },
+  {
+    title: "Voxel World",
+    description: "Voxel世界を舞台に、AIや魔法による大規模な戦争を作るゲームプロジェクト。",
+    status: "In Development",
+  },
+  {
+    title: "SNAPOUT",
+    description: "現実世界・都市データとゲームを組み合わせたインタラクティブプロジェクト。",
+    status: "In Development",
+  },
+];
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width"
+    />
+    <meta
+      name="description"
+      content="TATTO LAB / たっと研究室。AI、シミュレーション、ゲームを作って実験しています。"
+    />
+    <title>TATTO LAB | たっと研究室</title>
+  </head>
+
+  <body>
+    <header>
+      <a class="logo" href="/">
+        <strong>TATTO LAB</strong>
+        <span>たっと研究室</span>
+      </a>
+
+      <nav>
+        <a href="/projects">Projects</a>
+        <a href="/articles">Articles</a>
+        <a href="/about">About</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <p class="eyebrow">AI / SIMULATION / GAMES / EXPERIMENTS</p>
+
+        <h1>
+          作って、試して、<br />
+          分かったことを残す。
+        </h1>
+
+        <p class="lead">
+          AI、シミュレーション、ゲームを中心に、
+          気になったものを実際に作って検証しています。
+        </p>
+
+        <div class="hero-links">
+          <a class="primary-button" href="#projects">
+            Projectsを見る
+          </a>
+
+          <a class="secondary-button" href="/articles">
+            Articles
+          </a>
+        </div>
+      </section>
+
+      <section id="projects">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">SELECTED PROJECTS</p>
+            <h2>Projects</h2>
+          </div>
+
+          <a href="/projects">すべて見る →</a>
+        </div>
+
+        <div class="project-grid">
+          {projects.map((project) => (
+            <article class="project-card">
+              <div class="project-image">
+                <span>{project.title}</span>
+              </div>
+
+              <div class="project-content">
+                <div class="project-meta">
+                  <span>{project.status}</span>
+                </div>
+
+                <h3>{project.title}</h3>
+                <p>{project.description}</p>
+
+                <span class="project-link">
+                  View Project →
+                </span>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="articles">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">LATEST ARTICLES</p>
+            <h2>Articles</h2>
+          </div>
+        </div>
+
+        <div class="empty-state">
+          <p>
+            開発・研究の記録を、ここに記事として蓄積していきます。
+          </p>
+
+          <small>
+            Guitar AIの記事を準備中
+          </small>
+        </div>
+      </section>
+
+      <section class="about-preview">
+        <p class="eyebrow">ABOUT</p>
+
+        <h2>たっと研究室について</h2>
+
+        <p>
+          完成したものだけではなく、試行錯誤や失敗、
+          そこから得られた知見まで残していく個人研究・開発サイトです。
+        </p>
+
+        <a href="/about">About →</a>
+      </section>
+    </main>
+
+    <footer>
+      <strong>TATTO LAB</strong>
+      <span>© 2026</span>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    font-family:
+      Inter, "Noto Sans JP", "Hiragino Kaku Gothic ProN",
+      "Yu Gothic", sans-serif;
+
+    color: #eeeeee;
+    background: #0a0a0a;
+
+    font-synthesis: none;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(
+        circle at 70% 0%,
+        #18241e 0,
+        transparent 32rem
+      ),
+      #0a0a0a;
+    color: #ededed;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  header {
+    width: min(1180px, calc(100% - 40px));
+    margin: 0 auto;
+    min-height: 88px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .logo strong {
+    letter-spacing: 0.08em;
+  }
+
+  .logo span {
+    color: #888;
+    font-size: 0.72rem;
+  }
+
+  nav {
+    display: flex;
+    gap: 28px;
+    color: #aaa;
+    font-size: 0.9rem;
+  }
+
+  nav a:hover {
+    color: white;
+  }
+
+  main {
+    width: min(1180px, calc(100% - 40px));
+    margin: 0 auto;
+  }
+
+  .hero {
+    min-height: 650px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding: 80px 0 120px;
+  }
+
+  .eyebrow {
+    margin: 0 0 18px;
+    color: #84d3a1;
+
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+  }
+
+  h1 {
+    max-width: 880px;
+    margin: 0;
+
+    font-size: clamp(3.1rem, 8vw, 7.5rem);
+    line-height: 0.98;
+    letter-spacing: -0.06em;
+  }
+
+  .lead {
+    max-width: 620px;
+    margin: 36px 0 0;
+
+    color: #aaa;
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    line-height: 1.9;
+  }
+
+  .hero-links {
+    display: flex;
+    gap: 12px;
+    margin-top: 40px;
+  }
+
+  .primary-button,
+  .secondary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 13px 20px;
+    border-radius: 999px;
+
+    font-size: 0.88rem;
+  }
+
+  .primary-button {
+    background: #ededed;
+    color: #111;
+  }
+
+  .secondary-button {
+    border: 1px solid #333;
+    color: #bbb;
+  }
+
+  section {
+    padding: 100px 0;
+  }
+
+  .section-heading {
+    margin-bottom: 32px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .section-heading h2,
+  .about-preview h2 {
+    margin: 0;
+
+    font-size: clamp(2rem, 4vw, 4rem);
+    letter-spacing: -0.04em;
+  }
+
+  .section-heading > a {
+    color: #888;
+    font-size: 0.85rem;
+  }
+
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+
+  .project-card {
+    overflow: hidden;
+
+    border: 1px solid #242424;
+    border-radius: 18px;
+
+    background: #101010;
+  }
+
+  .project-image {
+    min-height: 280px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+      linear-gradient(
+        135deg,
+        #151515,
+        #222
+      );
+
+    color: #333;
+
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -0.05em;
+  }
+
+  .project-content {
+    padding: 26px;
+  }
+
+  .project-meta {
+    margin-bottom: 14px;
+
+    color: #73c793;
+    font-size: 0.72rem;
+  }
+
+  .project-content h3 {
+    margin: 0;
+
+    font-size: 1.55rem;
+  }
+
+  .project-content p {
+    min-height: 64px;
+    margin: 12px 0 22px;
+
+    color: #999;
+    line-height: 1.75;
+  }
+
+  .project-link {
+    color: #ddd;
+    font-size: 0.85rem;
+  }
+
+  .empty-state {
+    padding: 50px;
+
+    border: 1px solid #242424;
+    border-radius: 18px;
+
+    background: #101010;
+  }
+
+  .empty-state p {
+    margin-top: 0;
+  }
+
+  .empty-state small {
+    color: #777;
+  }
+
+  .about-preview {
+    max-width: 760px;
+  }
+
+  .about-preview > p:not(.eyebrow) {
+    margin: 28px 0;
+
+    color: #aaa;
+    font-size: 1.1rem;
+    line-height: 1.9;
+  }
+
+  .about-preview a {
+    border-bottom: 1px solid #555;
+  }
+
+  footer {
+    width: min(1180px, calc(100% - 40px));
+    margin: 80px auto 0;
+    padding: 30px 0 50px;
+
+    border-top: 1px solid #222;
+
+    display: flex;
+    justify-content: space-between;
+
+    color: #666;
+    font-size: 0.78rem;
+  }
+
+  @media (max-width: 700px) {
+    header {
+      align-items: flex-start;
+      padding-top: 24px;
+    }
+
+    nav {
+      gap: 14px;
+      font-size: 0.75rem;
+    }
+
+    .hero {
+      min-height: 560px;
+    }
+
+    .project-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .project-image {
+      min-height: 210px;
+    }
+
+    .hero-links {
+      flex-wrap: wrap;
+    }
+  }
+</style>

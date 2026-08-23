@@ -1,0 +1,85 @@
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>About | TATTO LAB</title>
+  </head>
+
+  <body>
+    <main>
+      <a href="/">← TATTO LAB</a>
+
+      <p class="eyebrow">ABOUT</p>
+      <h1>たっと研究室</h1>
+
+      <p class="lead">
+        AI、シミュレーション、ゲームを中心に、
+        気になったものを実際に作って検証する個人研究・開発サイトです。
+      </p>
+
+      <section>
+        <h2>作って、試して、分かったことを残す。</h2>
+
+        <p>
+          完成した作品だけではなく、実験、失敗、比較、
+          そこから得られた知見も含めて記録していきます。
+        </p>
+      </section>
+    </main>
+  </body>
+</html>
+
+<style>
+  :global(body) {
+    margin: 0;
+    background: #0a0a0a;
+    color: #eee;
+    font-family:
+      Inter, "Noto Sans JP", "Yu Gothic", sans-serif;
+  }
+
+  main {
+    width: min(900px, calc(100% - 40px));
+    margin: auto;
+    padding: 70px 0 140px;
+  }
+
+  a {
+    color: #888;
+    text-decoration: none;
+  }
+
+  .eyebrow {
+    margin-top: 120px;
+    color: #84d3a1;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+  }
+
+  h1 {
+    margin: 15px 0 30px;
+    font-size: clamp(3rem, 8vw, 6rem);
+    letter-spacing: -0.05em;
+  }
+
+  .lead {
+    max-width: 700px;
+    color: #aaa;
+    font-size: 1.2rem;
+    line-height: 2;
+  }
+
+  section {
+    margin-top: 100px;
+  }
+
+  section h2 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  section p {
+    color: #999;
+    line-height: 2;
+  }
+</style>

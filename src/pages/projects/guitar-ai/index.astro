@@ -1,0 +1,351 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Guitar AI | TATTO LAB"
+  description="自分のギターを高精度に切り抜くための専用AIを開発するTATTO LABのComputer Visionプロジェクト。"
+>
+  <main>
+    <section class="hero">
+      <p class="eyebrow">COMPUTER VISION / SEGMENTATION</p>
+
+      <h1>Guitar AI</h1>
+
+      <p class="hero-copy">
+        自分のギターだけを、<br />
+        高精度かつ高速に切り抜く。
+      </p>
+
+      <div class="status">
+        <span></span>
+        In Development
+      </div>
+    </section>
+
+    <section class="demo">
+      <div class="placeholder">
+        <span>DEMO VIDEO / IMAGE</span>
+      </div>
+    </section>
+
+    <section class="overview content">
+      <p class="eyebrow">OVERVIEW</p>
+      <h2>なぜ専用AIを作るのか。</h2>
+
+      <p>
+        動画からギターだけを高精度に切り抜くことを目的として、
+        ギターに特化したセグメンテーションモデルを開発しています。
+      </p>
+
+      <p>
+        汎用的な画像セグメンテーションモデルでも正面方向では
+        良好な結果が得られますが、ネック、細い弦、側面、
+        光沢や反射などではマスクが不安定になる場合があります。
+      </p>
+
+      <p>
+        そこで、データ収集からラベル生成、学習、評価、
+        軽量化まで含めて独自に検証しています。
+      </p>
+    </section>
+
+    <section class="content">
+      <p class="eyebrow">DATASET</p>
+      <h2>データを自分で作る。</h2>
+
+      <div class="two-column">
+        <article>
+          <div class="small-placeholder">
+            GREEN SCREEN
+          </div>
+
+          <h3>360° Green Screen</h3>
+
+          <p>
+            自分のギターをグリーンバック環境で様々な方向から撮影し、
+            背景合成用の素材を作成しています。
+          </p>
+        </article>
+
+        <article>
+          <div class="small-placeholder">
+            REAL VIDEO
+          </div>
+
+          <h3>Real Video + SAM3</h3>
+
+          <p>
+            実際の演奏・撮影環境の動画についても、
+            SAM3などを利用して教師データを作成しています。
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="content">
+      <p class="eyebrow">APPROACH</p>
+      <h2>いくつもの方法を比較する。</h2>
+
+      <div class="timeline">
+        <div>
+          <span>01</span>
+          <h3>Synthetic Data</h3>
+          <p>グリーンバック素材を様々な背景へ合成。</p>
+        </div>
+
+        <div>
+          <span>02</span>
+          <h3>Custom Models</h3>
+          <p>ギター専用の軽量モデルや独自構成を検証。</p>
+        </div>
+
+        <div>
+          <span>03</span>
+          <h3>Pretrained Models</h3>
+          <p>事前学習済みモデルとの比較・Fine-tuning。</p>
+        </div>
+
+        <div>
+          <span>04</span>
+          <h3>FDSL</h3>
+          <p>現在、有力な候補として検証を進めています。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="content">
+      <p class="eyebrow">RESULTS</p>
+      <h2>結果は、数字と映像の両方で見る。</h2>
+
+      <div class="metrics">
+        <div>
+          <strong>—</strong>
+          <span>IoU</span>
+        </div>
+
+        <div>
+          <strong>—</strong>
+          <span>Dice</span>
+        </div>
+
+        <div>
+          <strong>—</strong>
+          <span>BF1</span>
+        </div>
+
+        <div>
+          <strong>—</strong>
+          <span>FPS</span>
+        </div>
+      </div>
+
+      <p class="note">
+        最終モデル確定後に定量評価を掲載します。
+      </p>
+    </section>
+
+    <section class="content">
+      <p class="eyebrow">NEXT</p>
+      <h2>現在も開発中です。</h2>
+
+      <p>
+        精度評価、実動画への汎化性能、軽量化、
+        ONNX化やリアルタイム推論まで検証を進めます。
+      </p>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  main {
+    width: min(1180px, calc(100% - 40px));
+    margin: 0 auto;
+  }
+
+  section {
+    padding: 100px 0;
+  }
+
+  .hero {
+    min-height: 620px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .eyebrow {
+    margin: 0 0 18px;
+    color: #84d3a1;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(4rem, 11vw, 9rem);
+    line-height: 0.9;
+    letter-spacing: -0.06em;
+  }
+
+  .hero-copy {
+    margin: 35px 0;
+    color: #aaa;
+    font-size: clamp(1.4rem, 3vw, 2.4rem);
+    line-height: 1.5;
+    letter-spacing: -0.03em;
+  }
+
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #aaa;
+    font-size: 0.82rem;
+  }
+
+  .status span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #84d3a1;
+  }
+
+  .placeholder,
+  .small-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border: 1px solid #262626;
+    background:
+      linear-gradient(135deg, #151515, #202020);
+
+    color: #444;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+  }
+
+  .placeholder {
+    aspect-ratio: 16 / 9;
+    border-radius: 22px;
+    font-size: clamp(1rem, 3vw, 2rem);
+  }
+
+  .content {
+    max-width: 920px;
+  }
+
+  h2 {
+    max-width: 800px;
+    margin: 0 0 36px;
+    font-size: clamp(2.4rem, 6vw, 5rem);
+    line-height: 1.08;
+    letter-spacing: -0.05em;
+  }
+
+  .content > p:not(.eyebrow):not(.note) {
+    max-width: 760px;
+    color: #aaa;
+    font-size: 1.05rem;
+    line-height: 2;
+  }
+
+  .two-column {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .two-column article {
+    padding-bottom: 20px;
+  }
+
+  .small-placeholder {
+    aspect-ratio: 4 / 3;
+    border-radius: 16px;
+    margin-bottom: 24px;
+  }
+
+  h3 {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+  }
+
+  article p,
+  .timeline p {
+    color: #999;
+    line-height: 1.8;
+  }
+
+  .timeline {
+    border-top: 1px solid #292929;
+  }
+
+  .timeline > div {
+    display: grid;
+    grid-template-columns: 70px 220px 1fr;
+    gap: 20px;
+
+    padding: 28px 0;
+    border-bottom: 1px solid #292929;
+  }
+
+  .timeline span {
+    color: #666;
+  }
+
+  .timeline h3,
+  .timeline p {
+    margin: 0;
+  }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  .metrics div {
+    padding: 28px;
+    border: 1px solid #292929;
+    border-radius: 16px;
+    background: #101010;
+  }
+
+  .metrics strong {
+    display: block;
+    font-size: 2.7rem;
+  }
+
+  .metrics span {
+    color: #777;
+    font-size: 0.78rem;
+  }
+
+  .note {
+    margin-top: 20px;
+    color: #666;
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 700px) {
+    .hero {
+      min-height: 500px;
+    }
+
+    .two-column,
+    .metrics {
+      grid-template-columns: 1fr;
+    }
+
+    .timeline > div {
+      grid-template-columns: 40px 1fr;
+    }
+
+    .timeline p {
+      grid-column: 2;
+    }
+  }
+</style>
