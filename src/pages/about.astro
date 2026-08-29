@@ -1,85 +1,27 @@
-<html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>About | TATTO LAB</title>
-  </head>
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
 
-  <body>
-    <main>
-      <a href="/">← TATTO LAB</a>
+<BaseLayout title="About | TATTO LAB" description="TATTO LAB / たっと研究室について。AI、シミュレーション、ゲームを作って検証する個人研究・開発サイトです。">
+  <main>
+    <p class="eyebrow">ABOUT</p>
+    <h1>たっと研究室</h1>
+    <p class="lead">AI、シミュレーション、ゲームを中心に、気になったものを実際に作って検証する個人研究・開発サイトです。</p>
 
-      <p class="eyebrow">ABOUT</p>
-      <h1>たっと研究室</h1>
-
-      <p class="lead">
-        AI、シミュレーション、ゲームを中心に、
-        気になったものを実際に作って検証する個人研究・開発サイトです。
-      </p>
-
-      <section>
-        <h2>作って、試して、分かったことを残す。</h2>
-
-        <p>
-          完成した作品だけではなく、実験、失敗、比較、
-          そこから得られた知見も含めて記録していきます。
-        </p>
-      </section>
-    </main>
-  </body>
-</html>
+    <section>
+      <h2>作って、試して、分かったことを残す。</h2>
+      <p>完成した作品だけではなく、実験、失敗、比較、そこから得られた知見も含めて記録していきます。</p>
+    </section>
+  </main>
+</BaseLayout>
 
 <style>
-  :global(body) {
-    margin: 0;
-    background: #0a0a0a;
-    color: #eee;
-    font-family:
-      Inter, "Noto Sans JP", "Yu Gothic", sans-serif;
-  }
-
-  main {
-    width: min(900px, calc(100% - 40px));
-    margin: auto;
-    padding: 70px 0 140px;
-  }
-
-  a {
-    color: #888;
-    text-decoration: none;
-  }
-
-  .eyebrow {
-    margin-top: 120px;
-    color: #84d3a1;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-  }
-
-  h1 {
-    margin: 15px 0 30px;
-    font-size: clamp(3rem, 8vw, 6rem);
-    letter-spacing: -0.05em;
-  }
-
-  .lead {
-    max-width: 700px;
-    color: #aaa;
-    font-size: 1.2rem;
-    line-height: 2;
-  }
-
-  section {
-    margin-top: 100px;
-  }
-
-  section h2 {
-    font-size: clamp(2rem, 5vw, 3.5rem);
-  }
-
-  section p {
-    color: #999;
-    line-height: 2;
-  }
+  main { width: min(900px, calc(100% - 40px)); margin: auto; padding: 120px 0 60px; }
+  .eyebrow { margin: 0 0 16px; font-size: .75rem; font-weight: 800; letter-spacing: .18em; }
+  h1 { margin: 0 0 30px; font-size: clamp(3rem, 8vw, 6rem); line-height: 1; letter-spacing: -.05em; }
+  .lead { max-width: 700px; color: var(--text-muted); font-size: 1.2rem; line-height: 2; }
+  section { margin-top: 100px; padding-top: 46px; border-top: 1px solid var(--border); }
+  section h2 { max-width: 760px; margin: 0 0 28px; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.2; letter-spacing: -.04em; }
+  section p { max-width: 700px; color: var(--text-muted); line-height: 2; }
+  @media (max-width: 700px) { main { padding-top: 80px; } section { margin-top: 70px; } }
 </style>

@@ -1,0 +1,489 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const title = "Virtualな演奏動画を作りたくて、ギターを切り抜くAIを作っている";
+const description =
+  "MediaPipe Handsで作った手指Overlayを、実写のギター演奏へ自然に重ねたい。そこから始まった、自分のギター専用Segmentation AIの試行錯誤をまとめます。";
+---
+
+<BaseLayout title={`${title} | TATTO LAB`} description={description}>
+  <main>
+    <article>
+      <header class="article-header">
+        <a class="back" href="/articles">← Articles</a>
+        <p class="eyebrow">GUITAR AI / COMPUTER VISION</p>
+        <h1><span>Virtualな演奏動画を作りたくて、</span><span>ギターを切り抜くAIを作っている</span></h1>
+        <p class="lead">
+          MediaPipe Handsから始まった、自分のギター専用Segmentation AIの試行錯誤。
+        </p>
+        <div class="meta">
+          <time datetime="2026-08-29">2026.08.29</time>
+          <span>Research / Development</span>
+        </div>
+
+        <figure class="hero-media">
+          <img
+            src="/images/guitar-ai/article-01/virtual-guitar-ai-cover.webp"
+            alt="ギター切り抜きとHands Overlayを組み合わせた試作映像"
+            width="1600"
+            height="900"
+          />
+        </figure>
+      </header>
+
+      <div class="prose">
+        <p>
+          「Virtualな演奏動画」と言っても、最初から完成形があったわけではありません。
+        </p>
+
+        <p>
+          作りたかったのは、実際にギターを弾いている映像に、手や指の動きに連動したOverlayやエフェクトを重ねて、<strong>現実とVirtualが自然に混ざった演奏動画</strong>です。
+        </p>
+
+        <p>
+          以前、MediaPipe Handsを使って、左右の手や指の位置を検出し、その上にOverlayを表示する仕組みを作っていました。手の動きに反応して視覚表現を重ねるだけでも面白く、「これをもっと自然に見せられないか」と考えるようになりました。
+        </p>
+
+        <h2>まずは、以前作っていたHands Overlay</h2>
+
+        <figure class="media">
+          <iframe
+            class="youtube-embed"
+            src="https://www.youtube-nocookie.com/embed/X8n1tSD1bY4"
+            title="MediaPipe Hands Overlay Prototype｜ギター演奏 × Hand Tracking"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+          ></iframe>
+          <figcaption>
+            MediaPipe Handsを使って左右の手指を追跡し、実写映像へOverlayを重ねた以前の試作。
+          </figcaption>
+        </figure>
+
+        <p>
+          ここで一つ問題がありました。<strong>指の位置が分かるだけでは、現実とVirtualをきれいに混ぜられない</strong>ことです。
+        </p>
+
+        <p>
+          Overlayの一部をギターの後ろに隠したり、逆にギターより手前へ表示したりしたければ、「このPixelはギターなのか？」を知る必要があります。
+        </p>
+
+        <blockquote>
+          自分のギターだけを切り抜けるAIを作ればいいのでは？
+        </blockquote>
+
+        <p>これが、Guitar Segmentationを始めた理由です。</p>
+
+        <h2>今のAIなら、ギターくらい簡単に切り抜けると思っていた</h2>
+
+        <p>
+          最初は、そこまで難しい問題だとは思っていませんでした。画像Segmentationのモデルを調整すれば、ギターくらいはきれいに抜けるだろう、と考えていました。
+        </p>
+
+        <p>実際には、全然そんなことはありませんでした。</p>
+
+        <figure class="media">
+          <img
+            src="/images/guitar-ai/article-01/03_initial_failure.webp"
+            alt="初期ギターセグメンテーションモデルの失敗例"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            初期モデルの失敗例。ギターだけでなく、人や椅子、背景までまとめて「ギター」と判断してしまっていた。
+          </figcaption>
+        </figure>
+
+        <p>
+          ギターには大きなボディだけでなく、細いネックやヘッドストックがあります。さらに実際の演奏では、手がネックに重なり、腕がボディの前を通り、服とギターが接触します。動けばブレも発生し、金属部分では光の反射も起こります。
+        </p>
+
+        <p>
+          ただ「ギターらしい物体」を認識するだけではなく、<strong>人間と接触しながら動いているギターの輪郭をPixel単位で取る</strong>となると、一気に難しくなりました。
+        </p>
+
+        <h2>なら、自分でAIの教材を作ればいい</h2>
+
+        <p>
+          自分のギター専用AIを作るなら、自分のギターをたくさん見せればいい。そう考えて、最初にやったのが撮影環境作りでした。
+        </p>
+
+        <p>
+          まずはグリーンバックを用意して、ギターをいろいろな角度から撮影しました。そこからギター部分を切り抜き、別の背景へ合成すれば、大量の学習画像を作れます。
+        </p>
+
+        <figure class="media">
+          <img
+            src="/images/guitar-ai/article-01/01_green_screen_pipeline.webp"
+            alt="ギター撮影からSynthetic Dataを作るまでの工程"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            撮影したギターからcutoutを作成し、背景合成によってSynthetic Dataを生成した。
+          </figcaption>
+        </figure>
+
+        <p>
+          この方法で最終的に作ったSynthetic Datasetは<strong>5,000枚</strong>になりました。
+        </p>
+
+        <h3>グリーンバックが、必ずしも最適ではなかった</h3>
+
+        <p>
+          最初は「背景を緑一色にすれば簡単だろう」と思っていました。しかし実際には、布のしわによる影や照明のムラが出ます。さらにギターのペグのような金属部分には周囲の緑が反射し、SAM3でマスクを作る際にも扱いにくくなることがありました。
+        </p>
+
+        <p>
+          そこで途中から、<strong>家の白い壁を背景として使う方法</strong>も取り入れました。見た目としては専用グリーンバックの方がそれらしいのですが、実際には白壁の方が扱いやすい場面も多くありました。
+        </p>
+
+        <p>
+          目的はグリーンバックを使うことではありません。必要なのは、<strong>AIにとって扱いやすい教材を作ること</strong>です。モデルだけでなく、入力となる素材をどう撮るかもシステムの一部だと感じたポイントでした。
+        </p>
+
+        <h2>Syntheticだけでは、実際の演奏に届かなかった</h2>
+
+        <p>
+          Synthetic Dataを増やすことで、ギターそのものの形や角度、位置、スケールの多様性はかなり学習できるようになりました。
+        </p>
+
+        <p>
+          ただ、実際の演奏映像にはSyntheticでは再現しにくい要素があります。手がネックを握る。腕がボディに重なる。袖がギターに接触する。つまり、<strong>「ギター単体」と「人が持って弾いているギター」はかなり違う問題</strong>でした。
+        </p>
+
+        <p>そこで、実際の演奏映像そのものを学習データに加えることにしました。</p>
+
+        <h2>実写データは、SAM3に手伝ってもらって作った</h2>
+
+        <p>
+          実写データを増やすには、各フレームのギター領域に正解Maskを付ける必要があります。ただ、何百枚・何千枚もの画像をゼロから手で塗るのは大変です。
+        </p>
+
+        <p>
+          そこでSAM3にMask候補を作ってもらい、その後で人が確認・修正する形にしました。
+        </p>
+
+        <figure class="media">
+          <img
+            src="/images/guitar-ai/article-01/02_sam3_label_pipeline.webp"
+            alt="SAM3を利用したギターMask作成工程"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            SAM3でMask候補を作成し、その後に人が確認・修正したものをGround Truthとして使用した。
+          </figcaption>
+        </figure>
+
+        <p>
+          SAM3の出力をそのまま正解にはしていません。あくまで<strong>下書きをAIに手伝ってもらい、最後は人が確認する</strong>という流れです。
+        </p>
+
+        <p>
+          さらに「きれいに写っている演奏画像」だけではなく、手で隠れている、人だけが写っている、ギターだけが写っている、背景だけが写っている、といった、これまでモデルが失敗していたHard-caseを意識して追加しました。
+        </p>
+
+        <h2>モデルもかなり試した。でも、一番効いたのはデータだった</h2>
+
+        <p>
+          モデル側でも、Gabor Filter、BiRefNet、ImageNet事前学習、SegRCDB / FDSL、LP-FT、Multi-scale Feature、段階的Fine-Tuningなど、かなりいろいろ試しています。
+        </p>
+
+        <aside class="note-box">
+          <strong>この辺りは別記事へ</strong>
+          <p>
+            第一号では研究全体の流れを優先しています。各モデルやFine-Tuning方法の比較は、今後個別の記事として残していく予定です。
+          </p>
+        </aside>
+
+        <p>
+          ただ、第一号記事で一番大きかった変化を一つだけ挙げるなら、それはモデル変更ではありません。<strong>学習データの変更</strong>です。
+        </p>
+
+        <p>
+          最初の実写学習データは633枚でした。そこへ、モデルが苦手としている条件を狙って追加したReal Data 1,235枚を加え、合計1,868枚に増やしました。
+        </p>
+
+        <figure class="media">
+          <img
+            src="/images/guitar-ai/article-01/05_dataset_growth.webp"
+            alt="ギター学習データセットの増加過程"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            Real 633枚からHard-caseを追加して1,868枚へ。さらにSynthetic 623枚を補助的に追加した条件をSYN25と呼んでいる。
+          </figcaption>
+        </figure>
+
+        <figure class="media">
+          <img
+            src="/images/guitar-ai/article-01/04_hardcase_633_vs_1868.webp"
+            alt="Real 633枚と1868枚のHard-case性能比較"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            Hard-case validation 683枚では、IoUが0.2300→0.4868、BF1@2が0.1874→0.4529へ改善した。
+          </figcaption>
+        </figure>
+
+        <div class="metrics">
+          <div>
+            <span>Hard-case IoU</span>
+            <strong>0.230 → 0.487</strong>
+          </div>
+          <div>
+            <span>Hard-case BF1@2</span>
+            <strong>0.187 → 0.453</strong>
+          </div>
+        </div>
+
+        <p>
+          Lossや細かな閾値調整より、はるかに大きい変化でした。
+        </p>
+
+        <p>
+          このあたりから、<strong>「もっと良いモデルを探す」ことよりも、「今のモデルがどこで失敗しているかを見て、その条件を学習データに入れる」ことの方が重要なのではないか</strong>、という感覚がはっきりしてきました。
+        </p>
+
+        <h2>一度限界を感じたSyntheticを、もう一度使い直した</h2>
+
+        <p>
+          ここで少し面白かったのがSynthetic Dataです。最初の段階では、Syntheticだけでは実演奏に届かないことが分かっていました。
+        </p>
+
+        <p>
+          でも、それは「Syntheticが役に立たない」という意味ではないかもしれない。実写データが十分に増えた状態なら、役割の違う補助データとして効くのではないかと考えました。
+        </p>
+
+        <p>
+          Real 1,868枚に対して、SyntheticのPositive Sampleを623枚だけ追加しました。Realに対して約25%なので、この条件を<strong>SYN25</strong>と呼んでいます。
+        </p>
+
+        <ul>
+          <li><strong>Real Data</strong>：手・腕・袖・接触境界を学ぶ</li>
+          <li><strong>Synthetic Data</strong>：ギターの形・角度・姿勢・スケールの多様性を補う</li>
+        </ul>
+
+        <p>
+          その効果を、学習に使っていない新しい演奏動画541フレームで評価しました。
+        </p>
+
+        <figure class="media">
+          <img
+            src="/images/guitar-ai/article-01/06_final_real_vs_syn25.webp"
+            alt="Real-onlyモデルとSYN25モデルの演奏映像での比較"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            未学習の実演奏541フレームで比較。Syntheticを補助的に加えたSYN25では、Real-onlyより安定してギター領域を捉えた。
+          </figcaption>
+        </figure>
+
+        <div class="metrics">
+          <div>
+            <span>Final Playing IoU</span>
+            <strong>0.785 → 0.832</strong>
+          </div>
+          <div>
+            <span>Final Playing BF1@2</span>
+            <strong>0.781 → 0.843</strong>
+          </div>
+        </div>
+
+        <p>
+          特に興味深かったのは、Precisionをほとんど崩さないままRecallが改善したことです。単純にMaskを広げたのではなく、<strong>これまで見逃していたギター領域をより拾えるようになった</strong>と考えられます。
+        </p>
+
+        <h2>今は、ここまで切り抜けるようになった</h2>
+
+        <figure class="media">
+          <img
+            src="/images/guitar-ai/article-01/08_current_best_success.webp"
+            alt="現在のBest Modelによるギター切り抜き成功例"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            現時点のBest Model。演奏中でもボディ、ネック、ヘッドストックまで比較的安定して捉えられるようになった。
+          </figcaption>
+        </figure>
+
+        <p>
+          最初に「人も背景も全部ギター扱いしてしまう」状態だったことを思うと、かなり目的に近づいてきました。
+        </p>
+
+        <p>ただし、まだ完成ではありません。</p>
+
+        <h2>それでも、長袖とギターの境界はまだ難しい</h2>
+
+        <figure class="media">
+          <img
+            src="/images/guitar-ai/article-01/07_remaining_failure.webp"
+            alt="長袖とギターの接触境界で起きるセグメンテーション失敗"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            現在のBest Modelでも、長袖や手・腕がギターと接触する条件では境界の乱れが残る。
+          </figcaption>
+        </figure>
+
+        <p>
+          ギターそのものの形はかなり捉えられるようになった一方で、<strong>人間とギターが接触している境界をどう分離するか</strong>は、まだ次の課題として残っています。
+        </p>
+
+        <p>
+          次に効くのは、またモデルを大きく変えることではなく、長袖・手の遮蔽・接触境界のような難条件をさらに意識したデータ追加かもしれません。
+        </p>
+
+        <h2>そして、実際に重ねてみると、目指していた方向が見えてきた</h2>
+
+        <p>
+          ここまで作ってきたGuitar Segmentationを、以前作っていたMediaPipe HandsのOverlayと実際に組み合わせてみました。
+        </p>
+
+        <figure class="media featured-video">
+          <iframe
+            class="youtube-embed"
+            src="https://www.youtube-nocookie.com/embed/1IaxtNk0p9U"
+            title="自作ギター切り抜きAI × MediaPipe Hands｜Virtualな演奏動画を作ってみた"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+          ></iframe>
+          <figcaption>
+            現在のGuitar SegmentationとMediaPipe Hands Overlayを組み合わせた試作。目指していた「現実とVirtualを混ぜた演奏表現」が少し形になってきた。
+          </figcaption>
+        </figure>
+
+        <p>
+          これは完成版ではありません。境界にはまだ改善の余地がありますし、演出としても粗い部分があります。
+        </p>
+
+        <p>
+          それでも、この動画を作ったことで、最初に考えていた方向へ確かに進めている感触が出てきました。
+        </p>
+
+        <p>
+          やりたかったのは、単にギターをきれいに切り抜くことではありません。手や指の情報を使い、ギターとの前後関係を扱い、<strong>現実の演奏とVirtualな表現を自然に混ぜること</strong>でした。
+        </p>
+
+        <h2>AIを作ることが目的ではない</h2>
+
+        <p>
+          この研究はまだ途中です。ただ、ここまでやってみて、AI研究は「もっと強いモデルを探して終わり」ではないということを強く感じています。
+        </p>
+
+        <p>
+          何を作りたいのか。どんな失敗が起きているのか。どんな撮影環境が扱いやすいのか。どんなデータを増やせばいいのか。そうしたことを行ったり来たりしながら進める必要がありました。
+        </p>
+
+        <p>
+          グリーンバックから始めたのに、途中で白壁の方が扱いやすいと気づいたのもそうです。Syntheticだけでは足りないと分かったあとにReal Dataを増やし、さらにSyntheticを補助的に戻したのもそうです。
+        </p>
+
+        <p>
+          遠回りに見えても、そういう試行錯誤の積み重ねが、最終的には一番効いていました。
+        </p>
+
+        <p>
+          次は、このGuitar SegmentationとHands Overlayをもっと自然につないで、<strong>本当に「Virtualな演奏動画」と呼べる形</strong>まで仕上げていきたいと思っています。
+        </p>
+
+        <h2>この研究について、今後書きたいこと</h2>
+
+        <p>
+          第一号なので、今回は研究全体の流れを優先しました。裏ではかなりいろいろな実験をしています。
+        </p>
+
+        <ul>
+          <li>Synthetic Guitar Datasetをどう作ったか</li>
+          <li>SAM3を使った実写データ作成</li>
+          <li>FDSL / SegRCDBの転移学習</li>
+          <li>LP-FTはSegmentationでも効くのか</li>
+          <li>Multi-scale Featureは細い境界に効くのか</li>
+          <li>Gabor / Phaseを境界検出に使えるか</li>
+          <li>Real + Syntheticの比率をどう決めるか</li>
+        </ul>
+
+        <p>
+          このあたりは、今後それぞれ個別の記事として残していく予定です。
+        </p>
+
+        <div class="article-end">
+          <p class="eyebrow">TATTO LAB / GUITAR AI</p>
+          <p>作って、試して、分かったことを残していきます。</p>
+          <a href="/projects/guitar-ai">Guitar AI Projectを見る →</a>
+        </div>
+      </div>
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  main { width: min(var(--content-wide), calc(100% - 40px)); margin: 0 auto; }
+  article { padding-bottom: 40px; }
+  .article-header { display: block; width: 100%; max-width: 1000px; min-height: 0; margin: 0; padding: 72px 0 48px; }
+  .back { display: inline-block; margin-bottom: 72px; color: var(--text-subtle); font-size: .82rem; }
+  .back:hover { color: var(--accent); }
+  .eyebrow { margin: 0 0 18px; font-size: .72rem; font-weight: 800; letter-spacing: .18em; }
+  h1 { max-width: 1040px; margin: 0; font-size: clamp(2.55rem, 4.7vw, 4rem); line-height: 1.12; letter-spacing: -.045em; text-wrap: balance; word-break: auto-phrase; }
+  h1 span { display: block; }
+  .lead { max-width: 760px; margin: 34px 0 24px; color: var(--text-muted); font-size: clamp(1.15rem, 2.5vw, 1.52rem); line-height: 1.8; }
+  .meta { display: flex; gap: 18px; color: var(--text-subtle); font-size: .78rem; }
+  .hero-media { width: min(1080px, calc(100vw - 40px)); margin: 64px 0 0; }
+  .hero-media img, .media img { display: block; width: 100%; height: auto; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); }
+  .youtube-embed { display: block; width: 100%; aspect-ratio: 16/9; border: 0; border-radius: 20px; background: var(--media-bg); }
+  .prose { width: min(var(--content-text), 100%); margin: 72px 0 0; }
+  .prose > p, .prose > ul { color: var(--text-muted); font-size: 1.055rem; line-height: 2.05; }
+  .prose > p { margin: 0 0 30px; }
+  .prose strong { color: var(--text); font-weight: 750; }
+  h2 { margin: 100px 0 32px; color: var(--text); font-size: clamp(1.9rem, 3.8vw, 2.8rem); line-height: 1.3; letter-spacing: -.035em; text-wrap: balance; word-break: auto-phrase; }
+  h3 { margin: 64px 0 24px; font-size: 1.55rem; letter-spacing: -.025em; }
+  blockquote { margin: 46px 0; padding: 25px 30px; border-left: 3px solid var(--accent); background: var(--accent-soft); color: var(--text); font-size: clamp(1.25rem, 3vw, 1.72rem); font-weight: 750; line-height: 1.6; }
+  .media { width: min(1000px, calc(100vw - 40px)); margin: 46px 0 52px; }
+  .media:has(.youtube-embed) { padding: 12px; border-radius: 26px; background: var(--media-bg); }
+  figcaption { max-width: 760px; margin-top: 13px; color: var(--text-subtle); font-size: .8rem; line-height: 1.7; }
+  .media:has(.youtube-embed) figcaption { padding: 0 6px 4px; color: #aab2ac; }
+  .featured-video { margin-top: 36px; }
+  .metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; width: min(760px, 100%); margin: 40px 0; }
+  .metrics div { padding: 24px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); box-shadow: 0 1px 0 rgba(0,0,0,.02); }
+  .metrics span { display: block; margin-bottom: 10px; color: var(--text-subtle); font-size: .76rem; }
+  .metrics strong { font-size: clamp(1.4rem, 4vw, 2rem); }
+  ul { padding-left: 1.4em; }
+  li { margin: 9px 0; }
+  .note-box { margin: 42px 0; padding: 26px 28px; border: 1px solid #cfe1d4; border-radius: 16px; background: var(--accent-soft); }
+  .note-box strong { color: var(--accent); }
+  .note-box p { margin: 10px 0 0; color: var(--text-muted); line-height: 1.8; }
+  .article-end { margin-top: 110px; padding: 38px; border-radius: 20px; background: linear-gradient(135deg, #101411, #1a241d); color: var(--media-text); }
+  .article-end p { margin: 0 0 18px; color: #bdc5bf; }
+  .article-end .eyebrow { color: #84d3a1; }
+  .article-end a { display: inline-block; margin-top: 8px; color: #fff; font-weight: 750; }
+  @media (max-width: 700px) {
+    .article-header { padding-top: 42px; }
+    .back { margin-bottom: 48px; }
+    .hero-media, .media { width: 100%; }
+    .hero-media img, .media img, .youtube-embed { border-radius: 12px; }
+    .media:has(.youtube-embed) { padding: 8px; border-radius: 18px; }
+    .prose { margin-top: 48px; }
+    h1 span { display: inline; }
+    h1 span + span::before { content: " "; }
+    h2 { margin-top: 76px; }
+    .metrics { grid-template-columns: 1fr; }
+    blockquote { padding: 22px; margin-inline: 0; }
+  }
+</style>

@@ -9,76 +9,43 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
   <main>
     <section class="hero">
       <p class="eyebrow">COMPUTER VISION / SEGMENTATION</p>
-
       <h1>Guitar AI</h1>
-
-      <p class="hero-copy">
-        自分のギターだけを、<br />
-        高精度かつ高速に切り抜く。
-      </p>
-
-      <div class="status">
-        <span></span>
-        In Development
-      </div>
+      <p class="hero-copy">自分のギターだけを、<br />高精度かつ高速に切り抜く。</p>
+      <div class="status"><span></span>In Development</div>
     </section>
 
     <section class="demo">
-      <div class="placeholder">
-        <span>DEMO VIDEO / IMAGE</span>
-      </div>
+      <a class="demo-panel" href="/articles/virtual-guitar-ai">
+        <div>
+          <p class="demo-kicker">LATEST ARTICLE / DEMO</p>
+          <h2>Virtualな演奏動画へ。</h2>
+          <p>Guitar SegmentationとMediaPipe Handsを組み合わせた現在の試作と、ここまでの研究過程をまとめています。</p>
+          <strong>記事とデモを見る →</strong>
+        </div>
+      </a>
     </section>
 
     <section class="overview content">
       <p class="eyebrow">OVERVIEW</p>
       <h2>なぜ専用AIを作るのか。</h2>
-
-      <p>
-        動画からギターだけを高精度に切り抜くことを目的として、
-        ギターに特化したセグメンテーションモデルを開発しています。
-      </p>
-
-      <p>
-        汎用的な画像セグメンテーションモデルでも正面方向では
-        良好な結果が得られますが、ネック、細い弦、側面、
-        光沢や反射などではマスクが不安定になる場合があります。
-      </p>
-
-      <p>
-        そこで、データ収集からラベル生成、学習、評価、
-        軽量化まで含めて独自に検証しています。
-      </p>
+      <p>動画からギターだけを高精度に切り抜くことを目的として、ギターに特化したセグメンテーションモデルを開発しています。</p>
+      <p>汎用的な画像セグメンテーションモデルでも正面方向では良好な結果が得られますが、ネック、細い弦、側面、光沢や反射などではマスクが不安定になる場合があります。</p>
+      <p>そこで、データ収集からラベル生成、学習、評価、軽量化まで含めて独自に検証しています。</p>
     </section>
 
     <section class="content">
       <p class="eyebrow">DATASET</p>
       <h2>データを自分で作る。</h2>
-
       <div class="two-column">
         <article>
-          <div class="small-placeholder">
-            GREEN SCREEN
-          </div>
-
-          <h3>360° Green Screen</h3>
-
-          <p>
-            自分のギターをグリーンバック環境で様々な方向から撮影し、
-            背景合成用の素材を作成しています。
-          </p>
+          <div class="small-media">GREEN SCREEN / WHITE WALL</div>
+          <h3>Synthetic Data</h3>
+          <p>グリーンバックや白壁で撮影した自分のギターから切り抜き素材を作り、様々な背景へ合成しています。</p>
         </article>
-
         <article>
-          <div class="small-placeholder">
-            REAL VIDEO
-          </div>
-
-          <h3>Real Video + SAM3</h3>
-
-          <p>
-            実際の演奏・撮影環境の動画についても、
-            SAM3などを利用して教師データを作成しています。
-          </p>
+          <div class="small-media">REAL VIDEO + SAM3</div>
+          <h3>Real Data + SAM3</h3>
+          <p>実際の演奏・撮影環境の動画についても、SAM3を補助に使いながら教師データを作成しています。</p>
         </article>
       </div>
     </section>
@@ -86,266 +53,68 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     <section class="content">
       <p class="eyebrow">APPROACH</p>
       <h2>いくつもの方法を比較する。</h2>
-
       <div class="timeline">
-        <div>
-          <span>01</span>
-          <h3>Synthetic Data</h3>
-          <p>グリーンバック素材を様々な背景へ合成。</p>
-        </div>
-
-        <div>
-          <span>02</span>
-          <h3>Custom Models</h3>
-          <p>ギター専用の軽量モデルや独自構成を検証。</p>
-        </div>
-
-        <div>
-          <span>03</span>
-          <h3>Pretrained Models</h3>
-          <p>事前学習済みモデルとの比較・Fine-tuning。</p>
-        </div>
-
-        <div>
-          <span>04</span>
-          <h3>FDSL</h3>
-          <p>現在、有力な候補として検証を進めています。</p>
-        </div>
+        <div><span>01</span><h3>Synthetic Data</h3><p>撮影素材を様々な背景へ合成。</p></div>
+        <div><span>02</span><h3>Pretrained Models</h3><p>事前学習済み表現とFine-tuningを比較。</p></div>
+        <div><span>03</span><h3>Multi-scale</h3><p>細いネックや境界を残す構成を検証。</p></div>
+        <div><span>04</span><h3>Hard-case Data</h3><p>失敗条件そのものを学習データへ追加。</p></div>
       </div>
     </section>
 
-    <section class="content">
-      <p class="eyebrow">RESULTS</p>
-      <h2>結果は、数字と映像の両方で見る。</h2>
-
+    <section class="content results">
+      <p class="eyebrow">CURRENT RESULTS</p>
+      <h2>モデルだけでなく、データで改善する。</h2>
       <div class="metrics">
-        <div>
-          <strong>—</strong>
-          <span>IoU</span>
-        </div>
-
-        <div>
-          <strong>—</strong>
-          <span>Dice</span>
-        </div>
-
-        <div>
-          <strong>—</strong>
-          <span>BF1</span>
-        </div>
-
-        <div>
-          <strong>—</strong>
-          <span>FPS</span>
-        </div>
+        <div><strong>0.832</strong><span>Final Playing IoU</span></div>
+        <div><strong>0.907</strong><span>Dice</span></div>
+        <div><strong>0.843</strong><span>BF1@2</span></div>
+        <div><strong>541</strong><span>Test Frames</span></div>
       </div>
-
-      <p class="note">
-        最終モデル確定後に定量評価を掲載します。
-      </p>
+      <p class="note">現在のSYN25条件を、学習に使っていない演奏動画541フレームで評価した値です。</p>
     </section>
 
-    <section class="content">
+    <section class="content next">
       <p class="eyebrow">NEXT</p>
-      <h2>現在も開発中です。</h2>
-
-      <p>
-        精度評価、実動画への汎化性能、軽量化、
-        ONNX化やリアルタイム推論まで検証を進めます。
-      </p>
+      <h2>切り抜くことの先へ。</h2>
+      <p>手・腕・長袖との接触境界をさらに改善しながら、MediaPipe Handsとの統合やリアルタイム化を進めます。</p>
+      <a href="/articles/virtual-guitar-ai">第一号記事を読む →</a>
     </section>
   </main>
 </BaseLayout>
 
 <style>
-  main {
-    width: min(1180px, calc(100% - 40px));
-    margin: 0 auto;
-  }
-
-  section {
-    padding: 100px 0;
-  }
-
-  .hero {
-    min-height: 620px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .eyebrow {
-    margin: 0 0 18px;
-    color: #84d3a1;
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-  }
-
-  h1 {
-    margin: 0;
-    font-size: clamp(4rem, 11vw, 9rem);
-    line-height: 0.9;
-    letter-spacing: -0.06em;
-  }
-
-  .hero-copy {
-    margin: 35px 0;
-    color: #aaa;
-    font-size: clamp(1.4rem, 3vw, 2.4rem);
-    line-height: 1.5;
-    letter-spacing: -0.03em;
-  }
-
-  .status {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    color: #aaa;
-    font-size: 0.82rem;
-  }
-
-  .status span {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #84d3a1;
-  }
-
-  .placeholder,
-  .small-placeholder {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    border: 1px solid #262626;
-    background:
-      linear-gradient(135deg, #151515, #202020);
-
-    color: #444;
-    font-weight: 800;
-    letter-spacing: 0.1em;
-  }
-
-  .placeholder {
-    aspect-ratio: 16 / 9;
-    border-radius: 22px;
-    font-size: clamp(1rem, 3vw, 2rem);
-  }
-
-  .content {
-    max-width: 920px;
-  }
-
-  h2 {
-    max-width: 800px;
-    margin: 0 0 36px;
-    font-size: clamp(2.4rem, 6vw, 5rem);
-    line-height: 1.08;
-    letter-spacing: -0.05em;
-  }
-
-  .content > p:not(.eyebrow):not(.note) {
-    max-width: 760px;
-    color: #aaa;
-    font-size: 1.05rem;
-    line-height: 2;
-  }
-
-  .two-column {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-
-  .two-column article {
-    padding-bottom: 20px;
-  }
-
-  .small-placeholder {
-    aspect-ratio: 4 / 3;
-    border-radius: 16px;
-    margin-bottom: 24px;
-  }
-
-  h3 {
-    font-size: 1.4rem;
-    margin-bottom: 10px;
-  }
-
-  article p,
-  .timeline p {
-    color: #999;
-    line-height: 1.8;
-  }
-
-  .timeline {
-    border-top: 1px solid #292929;
-  }
-
-  .timeline > div {
-    display: grid;
-    grid-template-columns: 70px 220px 1fr;
-    gap: 20px;
-
-    padding: 28px 0;
-    border-bottom: 1px solid #292929;
-  }
-
-  .timeline span {
-    color: #666;
-  }
-
-  .timeline h3,
-  .timeline p {
-    margin: 0;
-  }
-
-  .metrics {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-  }
-
-  .metrics div {
-    padding: 28px;
-    border: 1px solid #292929;
-    border-radius: 16px;
-    background: #101010;
-  }
-
-  .metrics strong {
-    display: block;
-    font-size: 2.7rem;
-  }
-
-  .metrics span {
-    color: #777;
-    font-size: 0.78rem;
-  }
-
-  .note {
-    margin-top: 20px;
-    color: #666;
-    font-size: 0.8rem;
-  }
-
-  @media (max-width: 700px) {
-    .hero {
-      min-height: 500px;
-    }
-
-    .two-column,
-    .metrics {
-      grid-template-columns: 1fr;
-    }
-
-    .timeline > div {
-      grid-template-columns: 40px 1fr;
-    }
-
-    .timeline p {
-      grid-column: 2;
-    }
-  }
+  main { width: min(var(--content-wide), calc(100% - 40px)); margin: 0 auto; }
+  section { padding: 100px 0; }
+  .hero { min-height: 600px; display: flex; flex-direction: column; justify-content: center; }
+  .eyebrow { margin: 0 0 18px; font-size: .72rem; font-weight: 800; letter-spacing: .18em; }
+  h1 { margin: 0; font-size: clamp(4rem, 11vw, 8.5rem); line-height: .92; letter-spacing: -.06em; }
+  .hero-copy { margin: 35px 0; color: var(--text-muted); font-size: clamp(1.4rem, 3vw, 2.35rem); line-height: 1.5; letter-spacing: -.03em; }
+  .status { display: flex; align-items: center; gap: 9px; color: var(--text-muted); font-size: .82rem; }
+  .status span { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .demo { padding-top: 20px; }
+  .demo-panel { min-height: 420px; padding: clamp(34px, 6vw, 72px); border-radius: 24px; background: linear-gradient(135deg, #0d120f, #18241d); color: var(--media-text); display: flex; align-items: flex-end; overflow: hidden; }
+  .demo-panel > div { max-width: 720px; }
+  .demo-kicker { margin: 0 0 18px; color: #84d3a1; font-size: .72rem; font-weight: 800; letter-spacing: .18em; }
+  .demo-panel h2 { color: #fff; margin-bottom: 20px; }
+  .demo-panel p { color: #b8c2ba; line-height: 1.9; }
+  .demo-panel strong { display: inline-block; margin-top: 12px; color: #fff; }
+  .content { max-width: 920px; }
+  h2 { max-width: 820px; margin: 0 0 36px; font-size: clamp(2.4rem, 6vw, 5rem); line-height: 1.08; letter-spacing: -.05em; }
+  .content > p:not(.eyebrow):not(.note) { max-width: 760px; color: var(--text-muted); font-size: 1.05rem; line-height: 2; }
+  .two-column { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .two-column article { padding-bottom: 20px; }
+  .small-media { aspect-ratio: 4/3; margin-bottom: 24px; border-radius: 18px; display: flex; align-items: center; justify-content: center; background: var(--media-bg); color: rgba(255,255,255,.3); font-weight: 800; letter-spacing: .08em; }
+  h3 { font-size: 1.4rem; margin-bottom: 10px; }
+  article p, .timeline p { color: var(--text-muted); line-height: 1.8; }
+  .timeline { border-top: 1px solid var(--border); }
+  .timeline > div { display: grid; grid-template-columns: 70px 220px 1fr; gap: 20px; padding: 28px 0; border-bottom: 1px solid var(--border); }
+  .timeline span { color: var(--text-subtle); }
+  .timeline h3, .timeline p { margin: 0; }
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .metrics div { padding: 28px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
+  .metrics strong { display: block; font-size: 2.4rem; letter-spacing: -.04em; }
+  .metrics span { color: var(--text-subtle); font-size: .78rem; }
+  .note { margin-top: 20px; color: var(--text-subtle); font-size: .82rem; line-height: 1.7; }
+  .next a { display: inline-block; margin-top: 22px; color: var(--accent); font-weight: 800; }
+  @media (max-width: 700px) { .hero { min-height: 500px; } .two-column, .metrics { grid-template-columns: 1fr; } .timeline > div { grid-template-columns: 40px 1fr; } .timeline p { grid-column: 2; } .demo-panel { min-height: 340px; } }
 </style>
