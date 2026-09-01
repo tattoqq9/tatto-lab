@@ -14,6 +14,19 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     </section>
 
     <section class="articles">
+      <a class="article-card" href="/articles/inheritance-village-responsibility-diffusion">
+        <div class="thumb responsibility-thumb" aria-hidden="true">
+          <div class="mini-agents"><span>A0</span><span>A1</span><span>A2</span><span>A3</span></div>
+          <strong>OWNER<br />0</strong>
+        </div>
+        <div class="card-body">
+          <div class="meta"><span>LLM / MULTI-AGENT / COORDINATION</span><time datetime="2026-09-01">2026.09.01</time></div>
+          <h2>全員「誰かがやる」と考えた結果、誰もやらなかった</h2>
+          <p>長期任務の重要性は理解した。それでも担当者は0人。4人の判断ログから、協調失敗が生まれた過程を追います。</p>
+          <strong>Read Article →</strong>
+        </div>
+      </a>
+
       <a class="article-card" href="/articles/inheritance-village-two-weeks">
         <div class="thumb">
           <img src="https://raw.githubusercontent.com/tattoqq9/inheritance-village/main/docs/assets/latest_clean_start_g2_material_deposit.png" alt="継承する村のGeneration 2素材納品時の2Dリプレイ" width="1600" height="900" />
@@ -52,10 +65,14 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   .article-card:hover { transform: translateY(-3px); border-color: var(--border-strong); box-shadow: var(--shadow-soft); }
   .thumb { min-height: 360px; background: var(--media-bg); }
   .thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .responsibility-thumb { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: center; padding: clamp(26px, 5vw, 54px); background: linear-gradient(135deg, #eaf2ec, #dfeae2); }
+  .mini-agents { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .mini-agents span { display: grid; place-items: center; aspect-ratio: 1; border: 1px solid #c7d7cc; border-radius: 14px; background: rgba(255,255,255,.58); color: var(--accent); font-size: .76rem; font-weight: 850; }
+  .responsibility-thumb > strong { color: #26352b; font-size: clamp(2.6rem, 6vw, 5.2rem); line-height: .85; letter-spacing: -.07em; }
   .card-body { display: flex; flex-direction: column; justify-content: center; padding: clamp(28px, 5vw, 54px); }
   .meta { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 24px; color: var(--text-subtle); font-size: .7rem; letter-spacing: .08em; }
   .meta span { color: var(--accent); font-weight: 700; }
-  h2 { margin: 0; font-size: clamp(1.8rem, 4vw, 3.2rem); line-height: 1.2; letter-spacing: -.045em; }
+  h2 { margin: 0; font-size: clamp(1.8rem, 4vw, 3.2rem); line-height: 1.2; letter-spacing: -.045em; text-wrap: balance; word-break: auto-phrase; }
   .card-body p { margin: 24px 0; color: var(--text-muted); line-height: 1.8; }
   .card-body strong { color: var(--accent); font-size: .82rem; }
   @media (max-width: 800px) { .hero { padding-top: 80px; } .article-card { grid-template-columns: 1fr; } .thumb { min-height: 0; aspect-ratio: 16/9; } .meta { flex-direction: column; gap: 6px; } }
