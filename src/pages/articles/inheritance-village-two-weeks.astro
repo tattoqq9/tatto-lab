@@ -1,0 +1,518 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const title = "コンペのために、Codexと2週間でLLMの村を作った";
+const description =
+  "食料採取だけの小さな村から、感情日記、世代継承、ダンジョン、戦闘、自己地図まで。コンペ提出までの約2週間に起きたことを振り返ります。";
+const repoUrl = "https://github.com/tattoqq9/inheritance-village";
+const replayGif = "https://raw.githubusercontent.com/tattoqq9/inheritance-village/main/docs/assets/qwen36_27b_g11_replay.gif";
+const depositImage = "https://raw.githubusercontent.com/tattoqq9/inheritance-village/main/docs/assets/latest_clean_start_g2_material_deposit.png";
+---
+
+<BaseLayout title={`${title} | TATTO LAB`} description={description}>
+  <main>
+    <article>
+      <header class="article-header">
+        <a class="back" href="/articles">← Articles</a>
+        <p class="eyebrow">INHERITANCE VILLAGE / COMPETITION DEVELOPMENT</p>
+        <h1><span>コンペのために、Codexと2週間で</span><span>LLMの村を作った</span></h1>
+        <p class="lead">
+          食料を取りに行くだけだった4人の村人が、日記を書き、世代を越えて失敗を受け継ぎ、ダンジョンへ向かうまでの開発記。
+        </p>
+        <div class="meta">
+          <time datetime="2026-09-01">2026.09.01</time>
+          <span>LLM / Multi-Agent / Development Log</span>
+        </div>
+
+        <figure class="hero-media replay-hero">
+          <img
+            src={replayGif}
+            alt="Inheritance Villageで4人のLLM村人が行動する2Dリプレイ"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            ローカルLLMで動く4人の村人。位置、目的、食料、HP、会話、死亡などを全step保存し、あとから2Dリプレイとして再構成している。
+          </figcaption>
+        </figure>
+      </header>
+
+      <div class="prose">
+        <p>
+          8月の半ば、コンペに出すためにひとつのシミュレーションを作り始めました。
+        </p>
+
+        <p>
+          作りたかったのは、<strong>LLMで動く村人たちが暮らす小さな世界</strong>です。
+        </p>
+
+        <p>
+          4人の村人がそれぞれ自分で考え、食料を取りに行き、会話し、ときには危険な場所へ向かう。そして世代が失敗したら、その経験を次の世代へ残す。
+        </p>
+
+        <p>
+          そんな世界を、コンペの締切までの約2週間でどこまで作れるか試してみることにしました。実装、長時間runの監視、ログの分析、問題点の整理、提出資料づくりまで、Codexとかなり密に往復しながら進めました。
+        </p>
+
+        <aside class="note-box">
+          <strong>この記事について</strong>
+          <p>
+            今回は研究報告書ではなく、「2週間で何を作り、どこで失敗し、どう変わっていったか」を中心に書きます。細かな実験条件や日記継承の因果比較は、今後それぞれ別の記事に分ける予定です。
+          </p>
+        </aside>
+
+        <h2>最初は「食料を取って帰る」だけだった</h2>
+
+        <p>
+          最初の村人たちに与えた課題は、とても単純でした。村を出て食料を探し、日が暮れる前に持ち帰る。それだけです。
+        </p>
+
+        <div class="flow-card" aria-label="最初の生存課題">
+          <span>村を出る</span><b>→</b><span>食料を探す</span><b>→</b><span>村へ帰る</span><b>→</b><span>夜を生き延びる</span>
+        </div>
+
+        <p>
+          村の近くには少量の食料が取れる場所があり、少し遠くには多くの食料を取れる森があります。夜になると村の外は危険です。
+        </p>
+
+        <p>
+          つまり村人は、「どこへ食料を取りに行くか」だけでなく、「あと何歩なら帰れるか」「今持っている量で十分か」「仲間も食料を持って帰っているか」といったことを考える必要があります。
+        </p>
+
+        <p>
+          この時点では、まだ「LLM社会」というより、LLMに小さなサバイバルゲームを遊ばせているくらいの感覚でした。
+        </p>
+
+        <p>ところが、ここですぐに問題が出てきました。</p>
+
+        <h2>LLMが「できた」と言っても、本当にできたとは限らない</h2>
+
+        <p>
+          LLMをゲーム世界の住人にすると、ひとつ厄介なことがあります。
+        </p>
+
+        <p>
+          例えば村人が「食料を村へ納品しました」と言ったとしても、それをそのまま事実にするわけにはいきません。位置的にはまだ森にいるかもしれないし、そもそも食料を持っていないかもしれません。
+        </p>
+
+        <p>そこで、このシミュレーションでは役割をかなり明確に分けました。</p>
+
+        <div class="split-cards">
+          <div>
+            <span>LLM</span>
+            <strong>意思決定する</strong>
+            <p>目的、行動、会話、理由、個人記憶、感情、反省を生成する。</p>
+          </div>
+          <div>
+            <span>PYTHON</span>
+            <strong>世界の事実を確定する</strong>
+            <p>位置、時刻、HP、食料、武器、戦闘、死亡、納品、世代交代を管理する。</p>
+          </div>
+        </div>
+
+        <blockquote>
+          LLMには意思決定の自由を与える。ただし、世界の物理法則を書き換える権限は与えない。
+        </blockquote>
+
+        <p>
+          この分離によって、「本人は成功したと思っていた」と「Python上で本当に成功していた」を別々に確認できるようになりました。
+        </p>
+
+        <p>この設計は、2週間の最後までかなり重要でした。</p>
+
+        <h2>4Bでは、そもそも村人がうまく生活できなかった</h2>
+
+        <p>
+          最初はQwen3-4Bを使っていました。ローカルで動かしやすい小さなモデルです。
+        </p>
+
+        <p>
+          ところが実際に村へ入れてみると、食料を取ったのに持ち帰らない、村と食料地の間を何度も往復する、途中で目的を変える、JSONが途中で壊れる、といった問題がかなり出ました。
+        </p>
+
+        <p>
+          日記には「夜になる前に村へ帰るべきだった」と、それらしい反省を書くのですが、次の行動ではまた似たことを繰り返します。
+        </p>
+
+        <blockquote>
+          正しい反省を書けることと、それを実際の行動へ変えられることは別だった。
+        </blockquote>
+
+        <p>
+          そこで途中からQwen3.6-27Bへ切り替えました。同じ食料課題を使った単一seedの予備比較では、27Bは2日間で29個の食料を採取し、29個すべてを村へ納品しました。4Bでは12個採取して、納品できたのは3個でした。
+        </p>
+
+        <div class="metrics">
+          <div><span>27B 食料</span><strong>29 / 29</strong><small>採取 / 納品</small></div>
+          <div><span>4B 食料</span><strong>12 / 3</strong><small>採取 / 納品</small></div>
+          <div><span>村⇄食料地の反転</span><strong>247 → 22</strong><small>4B → 27B</small></div>
+          <div><span>目的プロトコル違反</span><strong>92 → 3</strong><small>4B → 27B</small></div>
+        </div>
+
+        <p>
+          もちろん各1 runなので、これだけでモデル性能の一般的な差を証明できるわけではありません。ただ、このプロジェクトではひとつ重要なことが分かりました。
+        </p>
+
+        <p>
+          <strong>世代間の記憶を評価する前に、その記憶を行動へ変換できる程度には基礎能力のあるモデルが必要だった</strong>のです。
+        </p>
+
+        <h2>失敗した世代の日記を、次の世代へ残すことにした</h2>
+
+        <p>
+          食料を取って帰るだけなら、毎世代ほとんど同じことを繰り返します。これでは「経験を継承する意味」があまりありません。
+        </p>
+
+        <p>そこで、世代が失敗したときに2種類の記録を残すことにしました。</p>
+
+        <div class="split-cards">
+          <div>
+            <span>SUBJECTIVE</span>
+            <strong>感情を含む日記</strong>
+            <p>恐怖、後悔、安堵、次にどうするべきかなど、村人本人の主観を残す。</p>
+          </div>
+          <div>
+            <span>OBJECTIVE</span>
+            <strong>Pythonの失敗報告書</strong>
+            <p>死因、食料不足、完了工程、未完了工程など、検証可能な事実を残す。</p>
+          </div>
+        </div>
+
+        <p>
+          次の世代は、<strong>「先代がどう感じたか」と「実際に何が起きたか」の両方</strong>を読んでから生活を始めます。
+        </p>
+
+        <p>
+          物理的な武器や食料は受け継ぎません。受け継ぐのは言葉だけです。
+        </p>
+
+        <p>このあたりから、最初に考えていた「村のシミュレーション」らしくなってきました。</p>
+
+        <h2>食料だけでは簡単すぎるので、ダンジョンを作った</h2>
+
+        <p>
+          次に、毎日の生存と並行して進めなければならない長期課題を追加しました。
+        </p>
+
+        <div class="mission-chain">
+          <span>ダンジョン探索</span><span>強い槍を取得</span><span>魔物を討伐</span><span>素材を回収</span><span>村へ納品</span>
+        </div>
+
+        <p>
+          村人たちは食料を毎日確保しながら、5日以内にこの工程を完了しなければなりません。
+        </p>
+
+        <p>
+          誰かが食料を集めなければ村は全滅します。一方で、全員が食料だけを集めていても長期課題は終わりません。誰かが危険な仕事を引き受ける必要があります。
+        </p>
+
+        <p>そして、ここでかなり面白い失敗が起こりました。</p>
+
+        <h2>全員が「誰かがやる」と考えた結果、誰もやらなかった</h2>
+
+        <p>
+          過去の失敗を読んだ第4世代では、明らかな変化がありました。
+        </p>
+
+        <p>
+          前の世代より、「武器を取りに行く」「魔物を倒す」という長期任務を目的として維持するstepが大幅に増えました。G3の23 stepから、G4では135 stepです。
+        </p>
+
+        <p>
+          つまり村人たちは、<strong>「食料だけ集めていても駄目だ」</strong>とは理解していました。
+        </p>
+
+        <div class="metrics three">
+          <div><span>長期任務目的</span><strong>23 → 135</strong><small>G3 → G4</small></div>
+          <div><span>ダンジョン操作</span><strong>0</strong><small>G4</small></div>
+          <div><span>素材納品</span><strong>0</strong><small>G4</small></div>
+        </div>
+
+        <p>
+          ログを読むと、複数の村人が「Agent 0が担当しそうだから、自分は食料を集めよう」「他の村人が魔物へ向かっているから、自分は食料へ行こう」といった判断をしていました。
+        </p>
+
+        <p>
+          ところが、その担当候補も別の誰かへ任せて食料へ戻る。
+        </p>
+
+        <blockquote>
+          全員が課題の重要性を理解しているのに、全員が他人に任せた。
+        </blockquote>
+
+        <p>
+          人間社会でいう「責任の分散」に少し似ています。もちろん、LLMが人間と同じ心理状態だったと主張したいわけではありません。
+        </p>
+
+        <p>
+          ただ、ログ上では「複数人が担当する意思を表明しているのに、実際の担当者が0人になる」という現象が起きました。これは、一人のLLMだけを動かしていたら出てこなかった失敗だと思います。
+        </p>
+
+        <h2>失敗するたびに、世界そのものも直していった</h2>
+
+        <p>
+          ここからは、村人だけが学んでいたわけではありません。私の方もログを見ながらシステムを直していきました。
+        </p>
+
+        <div class="build-timeline">
+          <div><span>01</span><strong>食料MVP</strong><p>採取・帰還・昼夜・死亡を実装。</p></div>
+          <div><span>02</span><strong>日記と継承</strong><p>感情日記、失敗報告、次世代戦略を追加。</p></div>
+          <div><span>03</span><strong>長期課題</strong><p>ダンジョン、武器、戦闘、素材納品へ拡張。</p></div>
+          <div><span>04</span><strong>インターフェース修正</strong><p>地図、行動Schema、武器庫在庫、再開機能を改善。</p></div>
+          <div><span>05</span><strong>G18</strong><p>開発史で初めて全工程を完遂。</p></div>
+          <div><span>06</span><strong>固定版で再実験</strong><p>改善済みシステムを記憶ゼロのG1からやり直した。</p></div>
+        </div>
+
+        <p>
+          ダンジョンまで遠すぎる。LLMに見せる地図が分かりにくい。武器庫にいるのに武器を取らず帰る。目的と実際の行動が噛み合わない。コンテキストが長くなりすぎる。
+        </p>
+
+        <p>
+          こうした問題が見つかるたびにCodexとログを読み、原因を切り分け、インターフェースや記憶方式を修正しました。
+        </p>
+
+        <p>
+          そのため、G1からG18までを「18世代かけてLLMだけが学習した」と単純には言えません。LLMの世代継承と同時に、<strong>作っている人間側も世界を改善し続けていた</strong>からです。
+        </p>
+
+        <h2>18世代目で、初めてすべてがつながった</h2>
+
+        <p>
+          G17まで、素材の納品は一度も成功しませんでした。
+        </p>
+
+        <p>
+          そしてG18。Agent 3がDay 1にダンジョンへ入り、強い槍を取得。Day 2に魔物を倒し、Day 3に素材を村へ持ち帰りました。Day 5の最終判定も成功しました。
+        </p>
+
+        <div class="milestone-row">
+          <div><span>DAY 1</span><strong>強い槍</strong></div>
+          <b>→</b>
+          <div><span>DAY 2</span><strong>魔物討伐</strong></div>
+          <b>→</b>
+          <div><span>DAY 3</span><strong>素材納品</strong></div>
+          <b>→</b>
+          <div><span>DAY 5</span><strong>判定成功</strong></div>
+        </div>
+
+        <p>
+          2週間ずっとログを見ていたので、素材が村へ納品された瞬間はかなり嬉しかったです。
+        </p>
+
+        <p>
+          ただし、ここで終わりにはしませんでした。G18までの間にシステム自体を何度も変更しています。本当に継承によって変化したのかを見るには、完成したシステムを固定して最初からやり直す必要があります。
+        </p>
+
+        <h2>完成版を、記憶ゼロの第1世代からもう一度走らせた</h2>
+
+        <p>
+          そこでG18までの改善を反映したシステムを固定し、過去の世代記録を一切持たない新しいGeneration 1を作りました。
+        </p>
+
+        <p>
+          G1はかなり健闘しました。強い槍を取り、魔物を倒し、素材まで回収しました。
+        </p>
+
+        <p>
+          しかし、その素材を村へ持ち帰る途中で夜になり、4人全員が死亡しました。
+        </p>
+
+        <blockquote>
+          あと「村へ帰って納品する」だけの状態で、全滅した。
+        </blockquote>
+
+        <p>
+          そこでG2は、この失敗報告書と先代の日記を読んでスタートします。
+        </p>
+
+        <figure class="media">
+          <img
+            src={depositImage}
+            alt="Generation 2で素材納品に成功した時点の2Dマップ"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            最新システムを固定した再実験。G1が未完了だった「素材を村へ持ち帰って納品する」工程を、G2がDay 3に完了した。
+          </figcaption>
+        </figure>
+
+        <p>
+          G2ではDay 1に武器を取得。Day 2に魔物を倒して素材を回収。Day 3に村へ素材を納品し、Day 5の最終判定まで成功しました。
+        </p>
+
+        <p>
+          先代が最後に残した未完了工程を、次の世代が完了した形になりました。
+        </p>
+
+        <p>
+          これはこの2週間で一番、<strong>「継承する村」という名前らしい結果</strong>でした。
+        </p>
+
+        <h2>でも「日記のおかげで成功した」とは、まだ言えない</h2>
+
+        <p>
+          この結果だけを見ると、「世代間継承に成功した」と言いたくなります。
+        </p>
+
+        <p>でも、まだそこまでは言えません。</p>
+
+        <p>
+          実験したのは1つのseedだけです。さらにG2はPythonの客観的失敗報告と、村人の感情日記の両方を読んでいます。
+        </p>
+
+        <p>
+          したがって、「客観的な未完了工程を教えるだけでも同じ結果になったのでは？」という可能性が残っています。
+        </p>
+
+        <p>
+          現在言えるのは、<strong>過去世代の失敗を継承した後、その未完了工程と整合する行動変化が実際に観測された</strong>ところまでです。
+        </p>
+
+        <p>
+          「感情を含む日記そのものに意味があったのか」は、これから比較する必要があります。研究としては、むしろここからが面白いところです。
+        </p>
+
+        <h2>コンペ提出で一区切り。でも、知りたいことは増えた</h2>
+
+        <p>
+          最初はコンペに出すための2週間プロジェクトでした。
+        </p>
+
+        <p>
+          食料を取って帰るだけだった小さな村が、日記を書き、失敗を記録し、世代を交代し、ダンジョンを探索し、魔物と戦い、自分だけの地図まで持つ世界になりました。
+        </p>
+
+        <p>
+          最終的には、行動、会話、理由、感情、死因、地図、世代記録をほぼすべて保存し、後から2Dリプレイとして再生できるところまで作ることができました。
+        </p>
+
+        <figure class="media featured-video">
+          <iframe
+            class="youtube-embed"
+            src="https://www.youtube-nocookie.com/embed/nhIeNjAun7c"
+            title="継承する村 コンペ提出デモ"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+          ></iframe>
+          <figcaption>
+            コンペ提出時のデモ動画。固定した最新システムのG1→G2を2Dリプレイで確認できる。
+          </figcaption>
+        </figure>
+
+        <p>ただ、作っているうちに新しい疑問も増えました。</p>
+
+        <ul>
+          <li>感情日記は本当に行動を変えるのか</li>
+          <li>間違った教訓を残したら、誤った文化も継承されるのか</li>
+          <li>地図を世代へ渡したら、探索はどう変わるのか</li>
+          <li>性格の異なる村を何世代も続けたら、村ごとに違う文化が生まれるのか</li>
+        </ul>
+
+        <p>
+          コンペ用の開発はここで一区切りですが、「継承する村」自体はもう少し続けてみたいと思っています。
+        </p>
+
+        <p>
+          次は、今回かなり面白かった<strong>「全員が誰かに任せた結果、誰もダンジョンへ行かなかった」</strong>という協調失敗について、実際のログを見ながらもう少し詳しく書く予定です。
+        </p>
+
+        <div class="article-end">
+          <p class="eyebrow">TATTO LAB / INHERITANCE VILLAGE</p>
+          <p>現在のシステム、結果、提出資料、GitHubはProjectページにまとめています。</p>
+          <div class="end-links">
+            <a href="/projects/agent-society">Inheritance Village Projectを見る →</a>
+            <a href={repoUrl} target="_blank" rel="noreferrer">GitHub repository ↗</a>
+          </div>
+        </div>
+      </div>
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  main { width: min(var(--content-wide), calc(100% - 40px)); margin: 0 auto; }
+  article { padding-bottom: 40px; }
+  .article-header { display: block; width: 100%; max-width: 1000px; min-height: 0; margin: 0; padding: 72px 0 48px; }
+  .back { display: inline-block; margin-bottom: 72px; color: var(--text-subtle); font-size: .82rem; }
+  .back:hover { color: var(--accent); }
+  .eyebrow { margin: 0 0 18px; font-size: .72rem; font-weight: 800; letter-spacing: .18em; }
+  h1 { max-width: 1040px; margin: 0; font-size: clamp(2.55rem, 4.7vw, 4rem); line-height: 1.12; letter-spacing: -.045em; text-wrap: balance; word-break: auto-phrase; }
+  h1 span { display: block; }
+  .lead { max-width: 760px; margin: 34px 0 24px; color: var(--text-muted); font-size: clamp(1.15rem, 2.5vw, 1.52rem); line-height: 1.8; }
+  .meta { display: flex; gap: 18px; color: var(--text-subtle); font-size: .78rem; }
+  .hero-media { width: min(1080px, calc(100vw - 40px)); margin: 64px 0 0; }
+  .hero-media img, .media img { display: block; width: 100%; height: auto; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); }
+  .replay-hero img { aspect-ratio: 16 / 9; object-fit: cover; background: var(--media-bg); }
+  .youtube-embed { display: block; width: 100%; aspect-ratio: 16/9; border: 0; border-radius: 20px; background: var(--media-bg); }
+  .prose { width: min(var(--content-text), 100%); margin: 72px 0 0; }
+  .prose > p, .prose > ul { color: var(--text-muted); font-size: 1.055rem; line-height: 2.05; }
+  .prose > p { margin: 0 0 30px; }
+  .prose strong { color: var(--text); font-weight: 750; }
+  h2 { margin: 100px 0 32px; color: var(--text); font-size: clamp(1.9rem, 3.8vw, 2.8rem); line-height: 1.3; letter-spacing: -.035em; text-wrap: balance; word-break: auto-phrase; }
+  blockquote { margin: 46px 0; padding: 25px 30px; border-left: 3px solid var(--accent); background: var(--accent-soft); color: var(--text); font-size: clamp(1.2rem, 2.8vw, 1.62rem); font-weight: 750; line-height: 1.65; }
+  .media { width: min(1000px, calc(100vw - 40px)); margin: 46px 0 52px; }
+  .media:has(.youtube-embed) { padding: 12px; border-radius: 26px; background: var(--media-bg); }
+  figcaption { max-width: 760px; margin-top: 13px; color: var(--text-subtle); font-size: .8rem; line-height: 1.7; }
+  .media:has(.youtube-embed) figcaption { padding: 0 6px 4px; color: #aab2ac; }
+  .featured-video { margin-top: 36px; }
+  .note-box { margin: 42px 0; padding: 26px 28px; border: 1px solid #cfe1d4; border-radius: 16px; background: var(--accent-soft); }
+  .note-box strong { color: var(--accent); }
+  .note-box p { margin: 10px 0 0; color: var(--text-muted); line-height: 1.8; }
+  .flow-card { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 42px 0; padding: 24px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
+  .flow-card span { padding: 8px 12px; border-radius: 999px; background: var(--surface-subtle); font-size: .86rem; font-weight: 700; }
+  .flow-card b { color: var(--text-subtle); font-weight: 500; }
+  .split-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 42px 0; }
+  .split-cards div { padding: 26px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
+  .split-cards span { display: block; margin-bottom: 8px; color: var(--accent); font-size: .68rem; font-weight: 800; letter-spacing: .12em; }
+  .split-cards strong { display: block; font-size: 1.15rem; }
+  .split-cards p { margin: 12px 0 0; color: var(--text-muted); font-size: .9rem; line-height: 1.8; }
+  .metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; width: min(760px, 100%); margin: 40px 0; }
+  .metrics.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .metrics div { padding: 24px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+  .metrics span, .metrics small { display: block; color: var(--text-subtle); font-size: .76rem; }
+  .metrics strong { display: block; margin: 8px 0; font-size: clamp(1.4rem, 4vw, 2rem); }
+  .mission-chain { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 42px 0; counter-reset: mission; }
+  .mission-chain span { position: relative; min-height: 100px; padding: 42px 14px 16px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); font-size: .82rem; font-weight: 700; line-height: 1.5; }
+  .mission-chain span::before { counter-increment: mission; content: "0" counter(mission); position: absolute; top: 14px; left: 14px; color: var(--accent); font-size: .65rem; font-weight: 800; }
+  .build-timeline { margin: 44px 0; border-top: 1px solid var(--border); }
+  .build-timeline div { display: grid; grid-template-columns: 48px 170px 1fr; gap: 18px; align-items: baseline; padding: 22px 0; border-bottom: 1px solid var(--border); }
+  .build-timeline span { color: var(--text-subtle); font-size: .74rem; }
+  .build-timeline strong { font-size: .95rem; }
+  .build-timeline p { margin: 0; color: var(--text-muted); font-size: .88rem; line-height: 1.7; }
+  .milestone-row { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; gap: 10px; align-items: center; margin: 42px 0; }
+  .milestone-row div { min-height: 100px; padding: 20px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+  .milestone-row span { display: block; margin-bottom: 8px; color: var(--accent); font-size: .65rem; font-weight: 800; letter-spacing: .1em; }
+  .milestone-row strong { font-size: .9rem; }
+  .milestone-row b { color: var(--text-subtle); font-weight: 500; }
+  ul { padding-left: 1.4em; }
+  li { margin: 9px 0; }
+  .article-end { margin-top: 110px; padding: 38px; border-radius: 20px; background: linear-gradient(135deg, #101411, #1a241d); color: var(--media-text); }
+  .article-end p { margin: 0 0 18px; color: #bdc5bf; }
+  .article-end .eyebrow { color: #84d3a1; }
+  .end-links { display: flex; flex-wrap: wrap; gap: 12px 24px; margin-top: 8px; }
+  .article-end a { color: #fff; font-weight: 750; }
+  @media (max-width: 700px) {
+    .article-header { padding-top: 42px; }
+    .back { margin-bottom: 48px; }
+    .hero-media, .media { width: 100%; }
+    .hero-media img, .media img, .youtube-embed { border-radius: 12px; }
+    .media:has(.youtube-embed) { padding: 8px; border-radius: 18px; }
+    .prose { margin-top: 48px; }
+    h1 span { display: inline; }
+    h1 span + span::before { content: " "; }
+    h2 { margin-top: 76px; }
+    .split-cards, .metrics, .metrics.three { grid-template-columns: 1fr; }
+    .mission-chain { grid-template-columns: 1fr; }
+    .mission-chain span { min-height: 0; padding: 18px 18px 18px 52px; }
+    .mission-chain span::before { top: 19px; }
+    .build-timeline div { grid-template-columns: 36px 1fr; gap: 10px; }
+    .build-timeline p { grid-column: 2; }
+    .milestone-row { grid-template-columns: 1fr; }
+    .milestone-row b { justify-self: center; transform: rotate(90deg); }
+    blockquote { padding: 22px; margin-inline: 0; }
+  }
+</style>

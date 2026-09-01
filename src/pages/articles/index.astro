@@ -14,6 +14,18 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     </section>
 
     <section class="articles">
+      <a class="article-card" href="/articles/inheritance-village-two-weeks">
+        <div class="thumb">
+          <img src="https://raw.githubusercontent.com/tattoqq9/inheritance-village/main/docs/assets/latest_clean_start_g2_material_deposit.png" alt="継承する村のGeneration 2素材納品時の2Dリプレイ" width="1600" height="900" />
+        </div>
+        <div class="card-body">
+          <div class="meta"><span>LLM / MULTI-AGENT / COMPETITION</span><time datetime="2026-09-01">2026.09.01</time></div>
+          <h2>コンペのために、Codexと2週間でLLMの村を作った</h2>
+          <p>食料採取だけの小さな村から、感情日記、世代継承、ダンジョン、戦闘まで。提出までの2週間を振り返ります。</p>
+          <strong>Read Article →</strong>
+        </div>
+      </a>
+
       <a class="article-card" href="/articles/virtual-guitar-ai">
         <div class="thumb">
           <img src="/images/guitar-ai/article-01/virtual-guitar-ai-cover.webp" alt="ギター切り抜きとHands Overlayを組み合わせた試作" width="1600" height="900" />
@@ -35,7 +47,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   .eyebrow { margin: 0 0 18px; font-size: .72rem; font-weight: 800; letter-spacing: .18em; }
   h1 { margin: 0; font-size: clamp(4rem, 10vw, 7.2rem); line-height: .95; letter-spacing: -.06em; }
   .lead { margin-top: 30px; color: var(--text-muted); font-size: clamp(1.1rem, 2.5vw, 1.55rem); }
-  .articles { padding: 20px 0 100px; }
+  .articles { display: grid; gap: 22px; padding: 20px 0 100px; }
   .article-card { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); overflow: hidden; border: 1px solid var(--border); border-radius: 22px; background: var(--surface); transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease; }
   .article-card:hover { transform: translateY(-3px); border-color: var(--border-strong); box-shadow: var(--shadow-soft); }
   .thumb { min-height: 360px; background: var(--media-bg); }
