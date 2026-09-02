@@ -1,0 +1,478 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const title = "AIの学習データが足りないので、自分のギターを5,000枚に増やした";
+const description =
+  "自分のギター専用AIを学習させるため、グリーンバック撮影、白壁、cutout、背景合成、augmentationを使って5,000枚のSynthetic Datasetを作った過程と、その限界をまとめます。";
+---
+
+<BaseLayout title={`${title} | TATTO LAB`} description={description}>
+  <main>
+    <article>
+      <header class="article-header">
+        <a class="back" href="/articles">← Articles</a>
+        <p class="eyebrow">GUITAR AI / DATASET / COMPUTER VISION</p>
+        <h1>
+          <span>AIの学習データが足りないので、</span>
+          <span>自分のギターを5,000枚に増やした</span>
+        </h1>
+        <p class="lead">
+          グリーンバックなら簡単だと思った。実際には、撮影環境からSynthetic Dataの使い方まで試行錯誤することになりました。
+        </p>
+        <div class="meta">
+          <time datetime="2026-09-01">2026.09.01</time>
+          <span>Research / Development</span>
+        </div>
+
+        <figure class="hero-media">
+          <img
+            src="/images/guitar-ai/article-02/07_synthetic_success_gallery.webp"
+            alt="異なる背景や配置へ合成したギターのSynthetic Data例"
+            width="1600"
+            height="900"
+          />
+        </figure>
+      </header>
+
+      <div class="prose">
+        <p>自分のギターだけを切り抜くAIを作ろう。</p>
+
+        <p>そう決めたあと、かなり早い段階で一つの問題にぶつかりました。</p>
+
+        <blockquote>学習させる画像が足りない。</blockquote>
+
+        <p>
+          AIに「これが自分のギターだ」と覚えてもらうためには、いろいろな角度、位置、背景で撮影したギター画像と、その正解となるMaskが必要です。
+        </p>
+
+        <p>
+          数十枚程度なら自分で撮影できます。でも、学習データとして何千枚も用意しようとすると、一枚ずつ撮影して、一枚ずつ正解Maskを作る方法ではかなり大変です。
+        </p>
+
+        <p>そこで考えました。</p>
+
+        <blockquote>
+          1本のギターを一度きれいに切り抜いて、背景や位置を変えながら何千枚にも増やせばいいのでは？
+        </blockquote>
+
+        <p>こうして、自分のギターを5,000枚に増やすことにしました。</p>
+
+        <h2>まずは、グリーンバックで撮影してみた</h2>
+
+        <p>
+          最初に考えたのは、かなり単純な方法です。ギターの後ろを緑一色にして撮影する。そうすれば背景とギターを簡単に分離できるだろうと思いました。
+        </p>
+
+        <p>そこでグリーンバックを用意し、自分のギターを角度や向きを変えながら撮影しました。</p>
+
+        <figure class="media">
+          <img
+            src="/images/guitar-ai/article-02/01_green_screen_wrinkles.webp"
+            alt="布のしわや影が残るグリーンバックで撮影したギター"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            最初は背景を全面グリーンにした。しかし布のしわや影、照明ムラまで、そのまま切り抜きの難しさになる。
+          </figcaption>
+        </figure>
+
+        <p>
+          やってみると、グリーンバックは想像していたほど「背景が完全に一色になる仕組み」ではありませんでした。
+        </p>
+
+        <p>
+          布なので、どうしてもしわができます。しわができれば影ができます。照明の当たり方によっても、明るい緑と暗い緑ができます。
+        </p>
+
+        <p>
+          人間の目には「全部緑だから背景だよね」と簡単に分かります。でも画像として見ると、そこにはかなり大きな色や明るさの違いがあります。
+        </p>
+
+        <p>グリーンバックを置けば、それだけで完璧な教師データが手に入るわけではありませんでした。</p>
+
+        <h2>さらに、ギター自身が緑色になった</h2>
+
+        <p>もう一つ予想していなかった問題がありました。<strong>反射</strong>です。</p>
+
+        <p>
+          ギターにはペグなどの金属パーツがあります。その金属部分に、周囲のグリーンバックが映り込みました。
+        </p>
+
+        <figure class="media">
+          <img
+            src="/images/guitar-ai/article-02/02_green_reflection_white_wall.webp"
+            alt="ペグへの緑色の反射と白壁で撮影したギターの比較"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            グリーンバックは万能ではなかった。金属パーツには緑が映り込むため、途中から白い壁も撮影背景として使った。
+          </figcaption>
+        </figure>
+
+        <p>
+          背景だけが緑ならまだ扱いやすいのですが、ギター自身の一部まで緑色になってしまいます。その状態でSAM系のモデルなどを使ってMask候補を作ると、ペグ周辺の境界が扱いにくいケースがありました。
+        </p>
+
+        <p>そこで途中から、<strong>家の白い壁を背景として使う</strong>という方法も試しました。</p>
+
+        <p>
+          専用の撮影設備でもありません。ただの白い壁です。でも、実際に使ってみると、こちらの方が扱いやすい場面がありました。
+        </p>
+
+        <p>ここで目的を考え直しました。</p>
+
+        <blockquote>
+          欲しいのは「グリーンバックで撮った画像」ではなく、ギターと背景をきれいに分離できる素材。
+        </blockquote>
+
+        <p>
+          それなら、必ずしも背景が緑である必要はありません。結果的に、最初は「ちゃんとした方法」だと思って導入したグリーンバックから、途中で白壁も使うようになりました。
+        </p>
+
+        <p>AIモデルを作っていたはずなのに、いつの間にか撮影環境まで実験対象になっていました。</p>
+
+        <h2>1枚のギターを、別の世界へ置いていく</h2>
+
+        <p>
+          撮影したギターから、最終的には人の目でも確認・修正したcutoutを作りました。ここからがSynthetic Data作りの本番です。
+        </p>
+
+        <p>やること自体はシンプルです。<strong>ギターだけを切り抜いて、別の背景へ置く。</strong></p>
+
+        <figure class="media">
+          <img
+            src="/images/guitar-ai/article-02/03_raw_cutout_composite.webp"
+            alt="元画像からcutoutを作り背景へ合成する3段階"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            撮影した1枚を人の目で補正したcutoutにし、別の背景へ合成する。これがSynthetic Dataの基本単位になった。
+          </figcaption>
+        </figure>
+
+        <p>
+          元の撮影画像では、当然ギターの背景は撮影した部屋です。でもギターだけを透明背景の画像として取り出してしまえば、部屋にも、屋外にも、まったく別の背景にも自由に置けます。
+        </p>
+
+        <p>
+          重要なのは、<strong>ギターそのもののMaskはすでに分かっている</strong>ことです。実写データでは画像ごとにMaskを作る必要がありますが、Synthetic Dataなら一度正しいcutoutを作ったあと、背景を変えても正解Maskを自動的に生成できます。
+        </p>
+
+        <aside class="note-box">
+          <strong>一度きれいな素材を作れば、その後を自動化できる</strong>
+          <p>
+            Synthetic Dataの大きな利点は、画像と正解Maskを同時に作れることでした。大量のsampleを増やしても、人が毎回Maskを塗る必要はありません。
+          </p>
+        </aside>
+
+        <h2>同じギターなのに、かなり違う画像になる</h2>
+
+        <p>
+          同じcutoutを使っていても、背景を変えるだけで見た目はかなり変わります。さらに位置や大きさ、角度も変えました。
+        </p>
+
+        <figure class="media">
+          <img
+            src="/images/guitar-ai/article-02/04_same_guitar_many_backgrounds.webp"
+            alt="同じギターを異なる背景、位置、大きさ、角度へ合成した6例"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            ギターは同じ1枚でも、背景、位置、大きさ、向きを変えると、別の学習画像として増やせる。背景写真の一部はCC BY 2.0。クレジットは記事末尾に記載。
+          </figcaption>
+        </figure>
+
+        <p>
+          この図に写っているギターは、元をたどれば同じsourceです。でも、背景、画面内の位置、大きさ、角度が違うだけで、モデルから見た入力はかなり変化します。
+        </p>
+
+        <p>
+          「自分のギターを5,000枚に増やした」と書くと、本当に5,000回シャッターを切ったようにも聞こえますが、実際にやったことは、<strong>少数の良いギター素材から、条件を変えた学習画像を大量に生成する</strong>ことです。
+        </p>
+
+        <h2>背景だけでなく、ギターの見え方も変える</h2>
+
+        <p>
+          背景だけを交換すると、「このギターはいつも同じ大きさ、同じ向きで出てくる」という不自然なDatasetになってしまいます。
+        </p>
+
+        <p>そこで、合成するときの条件もrandomizeしました。</p>
+
+        <figure class="media">
+          <img
+            src="/images/guitar-ai/article-02/05_augmentation_examples.webp"
+            alt="回転、scale、flip、brightness、saturation、shadowのaugmentation例"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            合成時には位置だけでなく、回転、大きさ、左右反転、明るさ、色、影もrandomizeした。
+          </figcaption>
+        </figure>
+
+        <p>
+          具体的には、回転、大きさ、位置、左右反転、明るさ、Contrast、Saturation、影などです。生成設定にはBlur、Noise、JPEG劣化も含めました。
+        </p>
+
+        <p>
+          ただし上の図では、sample単位で適用を確認できたrotation、scale、flip、brightness、saturation、shadowだけを実例として載せています。
+        </p>
+
+        <p>
+          AIに必要なのは、同じ画像を5,000回見せることではありません。少しずつ違う状況を見せて、<strong>「背景や明るさが変わっても、ここまでがギター」</strong>と学習してもらう必要があります。
+        </p>
+
+        <h2>そして、5,000枚になった</h2>
+
+        <p>こうして完成したDatasetを、<strong>GuitarSynthetic_v1</strong>と呼んでいます。</p>
+
+        <div class="metrics three">
+          <div><span>Train</span><strong>4,000</strong></div>
+          <div><span>Validation</span><strong>500</strong></div>
+          <div><span>Test</span><strong>500</strong></div>
+        </div>
+
+        <figure class="media">
+          <img
+            src="/images/guitar-ai/article-02/06_dataset_5000_structure.webp"
+            alt="GuitarSynthetic_v1の5,000 samplesと保存データ構成"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            完成したGuitarSynthetic_v1は5,000 samples。Train 4,000、Val 500、Test 500に分け、画像・soft alpha・binary maskを保存した。
+          </figcaption>
+        </figure>
+
+        <p>
+          各sampleには、普通の合成画像だけでなく、soft alphaとbinary maskも保存しています。つまり、<strong>AIへ渡す画像と「どこがギターか」という正解がセット</strong>になっています。
+        </p>
+
+        <p>
+          最初に「学習画像が足りない」というところから始まったので、5,000という数字を見たときは、かなり増やせた感覚がありました。
+        </p>
+
+        <h2>5,000枚あれば解決する……とはならなかった</h2>
+
+        <p>
+          ここまで来ると、「これだけあれば、かなり強いギターAIになるのでは？」と思いたくなります。実際、Synthetic Datasetの中ではかなり良い性能が出るようになりました。
+        </p>
+
+        <p>しかし、実際の演奏映像へ持っていくと問題が起きました。</p>
+
+        <figure class="media">
+          <img
+            src="/images/guitar-ai/article-02/08_domain_gap_and_syn25.webp"
+            alt="Synthetic testとReal validationのDomain Gap、およびSYN25への再利用を示した図"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            Synthetic内では良くても、実写へ移ると性能は落ちた。そこで後のSYN25では、Real Dataを主役にしつつ、選んだSynthetic 623枚を補助的に戻した。
+          </figcaption>
+        </figure>
+
+        <p>
+          図の上段は、同じSynthetic-trained checkpoint・同じthresholdで、Synthetic test 500枚とReal validation 186枚を評価した結果です。
+        </p>
+
+        <aside class="note-box warning">
+          <strong>この2つは同じ評価Datasetではありません</strong>
+          <p>
+            そのため「IoUが0.8123から0.6044へ落ちた」という単純なbefore / after比較として扱う数字ではありません。ここでは、Syntheticの世界と実写の世界の間にDomain Gapがあることを見るためのhistorical resultとして使っています。
+          </p>
+        </aside>
+
+        <p>
+          Synthetic Dataではギター単体を背景へ置いています。でも本当の演奏では、手がネックを握り、腕がボディに重なり、服の袖がギターと接触します。髪や身体、椅子、部屋の物体も入り、動けばMotion Blurも発生します。
+        </p>
+
+        <p>
+          つまり、<strong>「いろいろな背景に置かれたギター」と「人間が実際に弾いているギター」は、似ているようでかなり違うDataset</strong>でした。
+        </p>
+
+        <h2>では、Synthetic Data作りは失敗だったのか</h2>
+
+        <p>ここが今回、一番面白かったところです。</p>
+
+        <p>
+          Syntheticだけでは実演奏に届かなかった。だから「Synthetic Dataは意味がなかった」とも考えられます。でも実際には、そうなりませんでした。
+        </p>
+
+        <p>
+          その後、実際の演奏やHard-caseを含むReal Dataを増やしました。Real Dataが<strong>1,868枚</strong>まで増えた段階で、Syntheticを全部使うのではなく、そこから選んだ<strong>623枚</strong>を補助的に戻しました。
+        </p>
+
+        <div class="flow-box">
+          <span>Real 1,868</span>
+          <b>+</b>
+          <span>Synthetic 623</span>
+          <b>=</b>
+          <strong>SYN25 / 2,491</strong>
+        </div>
+
+        <p>
+          Realには、人とギターの接触、手や腕、服、実際の演奏環境を担当してもらう。Syntheticには、ギターの形、角度、位置、Scaleなどの多様性を補ってもらう。役割を分けました。
+        </p>
+
+        <p>
+          その後の正式なFinal Playing Testでは、SYN25条件で<strong>IoU 0.8322</strong>まで到達しました。
+        </p>
+
+        <blockquote>
+          Syntheticが悪かったのではなく、Syntheticだけですべてを解決しようとしたことに無理があった。
+        </blockquote>
+
+        <h2>データを増やすことと、現実を増やすことは違う</h2>
+
+        <p>
+          今回5,000枚のDatasetを作ってみて、一番印象に残ったのはここです。画像を5,000枚に増やすこと自体はできました。しかも、かなり自動化できます。
+        </p>
+
+        <p>
+          でも、<strong>画像枚数を増やすことと、現実世界の多様性を増やすことは同じではありません。</strong>
+        </p>
+
+        <p>
+          背景を100種類にしても、手がネックを握るという現象は生まれません。回転角度をrandomizeしても、長袖とギターが触れる境界は生まれません。
+        </p>
+
+        <p>
+          逆に、同じギターを違うScaleで何百回も出したり、背景を大量に交換したり、明るさを変えたりするのはSyntheticの方がはるかに簡単です。
+        </p>
+
+        <p>だから今は、<strong>RealかSyntheticかという二択で考えない</strong>方が良いと思っています。</p>
+
+        <h2>AIを作っていたら、撮影方法まで研究することになった</h2>
+
+        <p>
+          最初にやりたかったことはシンプルでした。自分のギターを切り抜くAIを作る。そのために学習データが必要だった。だからグリーンバックを用意した。
+        </p>
+
+        <p>
+          でもグリーンバックにはしわができた。金属には緑色が反射した。そこで白壁も使った。そこからcutoutを作って、背景へ合成して、5,000枚へ増やした。
+        </p>
+
+        <p>そして5,000枚作ったあとに、<strong>本物の演奏は、それとはまた違う</strong>と気づきました。</p>
+
+        <p>
+          AIモデルそのものよりも、「何を撮るか」「どう撮るか」「何をSyntheticで作るか」「何をRealで集めるか」を考えていた時間の方が長かったかもしれません。
+        </p>
+
+        <h2>次は「実際に失敗する場面」を集めた</h2>
+
+        <p>
+          Synthetic Datasetを作ったことで、ギターそのものの多様性はかなり増やせました。一方で、実演奏とのDomain Gapも見えてきました。
+        </p>
+
+        <p>
+          そこで次にやったのが、<strong>モデルが実際に失敗する場面を狙って、Real Dataを増やすこと</strong>です。
+        </p>
+
+        <p>
+          手や腕で隠れる場面。人しかいない場面。背景しかない場面。長袖とギターが接触する場面。
+        </p>
+
+        <p>
+          次の記事では、「良いデータを増やす」のではなく、<strong>AIが間違えるデータを増やしたらどうなったか</strong>という話を書こうと思います。
+        </p>
+
+        <nav class="article-nav" aria-label="関連記事">
+          <a href="/articles/virtual-guitar-ai">
+            <span>← 第一号</span>
+            <strong>Virtualな演奏動画を作りたくて、ギターを切り抜くAIを作っている</strong>
+          </a>
+          <a href="/projects/guitar-ai">
+            <span>Project</span>
+            <strong>Guitar AIを見る →</strong>
+          </a>
+        </nav>
+
+        <section class="credits">
+          <p class="credits-kicker">IMAGE CREDITS</p>
+          <h2>背景画像のクレジット</h2>
+          <p>
+            「同じギターなのに、かなり違う画像になる」の図では、Open Images V7経由のCC BY 2.0背景写真を5点使用しています。各画像はcrop・resizeしたうえでギターを合成しています。
+          </p>
+          <ul>
+            <li><a href="https://www.flickr.com/photos/46289172@N04/4650990358" target="_blank" rel="noreferrer">Michael Pedersen</a></li>
+            <li><a href="https://www.flickr.com/photos/argonne/8294405591" target="_blank" rel="noreferrer">Argonne National Laboratory</a></li>
+            <li><a href="https://www.flickr.com/photos/m0rjc/5360386389" target="_blank" rel="noreferrer">Richard Corfield</a></li>
+            <li><a href="https://www.flickr.com/photos/bcmom/94322627" target="_blank" rel="noreferrer">Anna</a></li>
+            <li><a href="https://www.flickr.com/photos/bigdog3c/413751625" target="_blank" rel="noreferrer">J. Todd Poling</a></li>
+          </ul>
+          <p>
+            License: <a href="https://creativecommons.org/licenses/by/2.0/" target="_blank" rel="noreferrer">Creative Commons Attribution 2.0</a>
+          </p>
+        </section>
+      </div>
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  main { width: min(var(--content-wide), calc(100% - 40px)); margin: 0 auto; }
+  article { padding-bottom: 100px; }
+  .article-header { display: block; width: 100%; max-width: 1160px; min-height: 0; margin: 0; padding: 72px 0 26px; }
+  .back { display: inline-block; margin-bottom: 76px; color: var(--text-subtle); font-size: .85rem; }
+  .back:hover { color: var(--accent); }
+  .eyebrow { margin: 0 0 24px; color: var(--accent); font-size: .72rem; font-weight: 800; letter-spacing: .18em; }
+  h1 { max-width: 1160px; margin: 0; font-size: clamp(2.85rem, 4.8vw, 4.2rem); line-height: 1.08; letter-spacing: -.05em; text-wrap: balance; word-break: auto-phrase; }
+  h1 span { display: block; }
+  .lead { max-width: 790px; margin: 34px 0 0; color: var(--text-muted); font-size: clamp(1.08rem, 2.2vw, 1.4rem); line-height: 1.85; }
+  .meta { display: flex; gap: 22px; margin-top: 28px; color: var(--text-subtle); font-size: .74rem; }
+  .hero-media, .media { margin: 50px 0; }
+  .hero-media { width: min(1080px, 100%); margin-bottom: 34px; }
+  .hero-media img, .media img { width: 100%; height: auto; display: block; border-radius: 20px; }
+  .prose { max-width: 760px; margin: 0 auto; font-size: 1.05rem; line-height: 2; }
+  .prose > p { margin: 1.55em 0; color: var(--text-muted); }
+  .prose strong { color: var(--text); }
+  .prose h2 { margin: 4.2rem 0 1.5rem; color: var(--text); font-size: clamp(2rem, 4.2vw, 3.45rem); line-height: 1.2; letter-spacing: -.045em; text-wrap: balance; word-break: auto-phrase; }
+  blockquote { margin: 2.8rem 0; padding: 26px 30px; border-left: 4px solid var(--accent); border-radius: 0 16px 16px 0; background: var(--accent-soft); color: #21492f; font-size: clamp(1.15rem, 2.3vw, 1.45rem); font-weight: 750; line-height: 1.65; }
+  .media { width: min(980px, calc(100vw - 40px)); margin-left: 50%; transform: translateX(-50%); }
+  figcaption { margin-top: 13px; color: var(--text-subtle); font-size: .8rem; line-height: 1.65; }
+  .note-box { margin: 2.6rem 0; padding: 24px 26px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
+  .note-box > strong { display: block; margin-bottom: 8px; color: var(--accent); }
+  .note-box p { margin: 0; color: var(--text-muted); line-height: 1.8; }
+  .note-box.warning { border-color: #ded6b8; background: #fffaf0; }
+  .note-box.warning > strong { color: #755d11; }
+  .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 2.6rem 0; }
+  .metrics.three { grid-template-columns: repeat(3, 1fr); }
+  .metrics div { padding: 24px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
+  .metrics span { display: block; margin-bottom: 5px; color: var(--text-subtle); font-size: .76rem; }
+  .metrics strong { display: block; font-size: clamp(1.7rem, 3vw, 2.3rem); letter-spacing: -.04em; }
+  .flow-box { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 13px; margin: 2.6rem 0; padding: 24px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
+  .flow-box span, .flow-box strong { padding: 10px 14px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: .9rem; }
+  .flow-box b { color: var(--text-subtle); }
+  .article-nav { display: grid; grid-template-columns: 1.4fr .6fr; gap: 14px; margin-top: 5rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+  .article-nav a { padding: 20px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+  .article-nav a:hover { border-color: var(--border-strong); box-shadow: var(--shadow-soft); }
+  .article-nav span { display: block; margin-bottom: 8px; color: var(--accent); font-size: .72rem; font-weight: 700; }
+  .article-nav strong { display: block; font-size: .9rem; line-height: 1.55; }
+  .credits { margin-top: 4.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+  .credits-kicker { margin: 0 0 12px !important; color: var(--accent) !important; font-size: .7rem; font-weight: 800; letter-spacing: .15em; }
+  .credits h2 { margin-top: 0; font-size: clamp(1.5rem, 3vw, 2.15rem); }
+  .credits p, .credits li { color: var(--text-subtle); font-size: .82rem; line-height: 1.75; }
+  .credits ul { padding-left: 1.3rem; }
+  .credits a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+  @media (max-width: 800px) {
+    .article-header { padding-top: 52px; }
+    .back { margin-bottom: 50px; }
+    h1 span { display: inline; }
+    h1 span + span::before { content: " "; }
+    .media { width: 100%; margin-left: 0; transform: none; }
+    .metrics, .metrics.three { grid-template-columns: 1fr; }
+    .article-nav { grid-template-columns: 1fr; }
+  }
+</style>

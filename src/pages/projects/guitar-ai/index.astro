@@ -15,14 +15,17 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     </section>
 
     <section class="demo">
-      <a class="demo-panel" href="/articles/virtual-guitar-ai">
+      <div class="demo-panel">
         <div>
-          <p class="demo-kicker">LATEST ARTICLE / DEMO</p>
-          <h2>Virtualな演奏動画へ。</h2>
-          <p>Guitar SegmentationとMediaPipe Handsを組み合わせた現在の試作と、ここまでの研究過程をまとめています。</p>
-          <strong>記事とデモを見る →</strong>
+          <p class="demo-kicker">LATEST ARTICLE</p>
+          <h2>自分のギターを5,000枚に増やした。</h2>
+          <p>グリーンバック、白壁、cutout、背景合成。GuitarSynthetic_v1を5,000 samplesまで増やした過程と、Syntheticだけでは実演奏に届かなかった理由をまとめました。</p>
+          <div class="demo-links">
+            <a href="/articles/synthetic-guitar-dataset">第二号記事を読む →</a>
+            <a href="/articles/virtual-guitar-ai">第一号記事：Virtualな演奏動画へ →</a>
+          </div>
         </div>
-      </a>
+      </div>
     </section>
 
     <section class="overview content">
@@ -77,7 +80,10 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       <p class="eyebrow">NEXT</p>
       <h2>切り抜くことの先へ。</h2>
       <p>手・腕・長袖との接触境界をさらに改善しながら、MediaPipe Handsとの統合やリアルタイム化を進めます。</p>
-      <a href="/articles/virtual-guitar-ai">第一号記事を読む →</a>
+      <div class="next-links">
+        <a href="/articles/synthetic-guitar-dataset">第二号記事を読む →</a>
+        <a href="/articles/virtual-guitar-ai">第一号記事を読む →</a>
+      </div>
     </section>
   </main>
 </BaseLayout>
@@ -93,11 +99,13 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
   .status span { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
   .demo { padding-top: 20px; }
   .demo-panel { min-height: 420px; padding: clamp(34px, 6vw, 72px); border-radius: 24px; background: linear-gradient(135deg, #0d120f, #18241d); color: var(--media-text); display: flex; align-items: flex-end; overflow: hidden; }
-  .demo-panel > div { max-width: 720px; }
+  .demo-panel > div { max-width: 760px; }
   .demo-kicker { margin: 0 0 18px; color: #84d3a1; font-size: .72rem; font-weight: 800; letter-spacing: .18em; }
   .demo-panel h2 { color: #fff; margin-bottom: 20px; }
   .demo-panel p { color: #b8c2ba; line-height: 1.9; }
-  .demo-panel strong { display: inline-block; margin-top: 12px; color: #fff; }
+  .demo-links { display: flex; flex-wrap: wrap; gap: 12px 22px; margin-top: 18px; }
+  .demo-links a { color: #fff; font-size: .86rem; font-weight: 800; }
+  .demo-links a:hover { color: #84d3a1; }
   .content { max-width: 920px; }
   h2 { max-width: 820px; margin: 0 0 36px; font-size: clamp(2.4rem, 6vw, 5rem); line-height: 1.08; letter-spacing: -.05em; }
   .content > p:not(.eyebrow):not(.note) { max-width: 760px; color: var(--text-muted); font-size: 1.05rem; line-height: 2; }
@@ -115,6 +123,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
   .metrics strong { display: block; font-size: 2.4rem; letter-spacing: -.04em; }
   .metrics span { color: var(--text-subtle); font-size: .78rem; }
   .note { margin-top: 20px; color: var(--text-subtle); font-size: .82rem; line-height: 1.7; }
-  .next a { display: inline-block; margin-top: 22px; color: var(--accent); font-weight: 800; }
+  .next-links { display: flex; flex-wrap: wrap; gap: 12px 24px; margin-top: 22px; }
+  .next-links a { color: var(--accent); font-weight: 800; }
   @media (max-width: 700px) { .hero { min-height: 500px; } .two-column, .metrics { grid-template-columns: 1fr; } .timeline > div { grid-template-columns: 40px 1fr; } .timeline p { grid-column: 2; } .demo-panel { min-height: 340px; } }
 </style>

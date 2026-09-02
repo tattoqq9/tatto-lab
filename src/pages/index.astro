@@ -80,15 +80,19 @@ const projects = [
         <a href="/articles">すべて見る →</a>
       </div>
 
-      <a class="article-preview" href="/articles/inheritance-village-responsibility-diffusion">
-        <div class="article-thumb responsibility-thumb" aria-hidden="true">
-          <div class="mini-agents"><span>A0</span><span>A1</span><span>A2</span><span>A3</span></div>
-          <strong>OWNER<br />0</strong>
+      <a class="article-preview" href="/articles/synthetic-guitar-dataset">
+        <div class="article-thumb">
+          <img
+            src="/images/guitar-ai/article-02/07_synthetic_success_gallery.webp"
+            alt="背景や配置を変えて生成したギターのSynthetic Data例"
+            width="1600"
+            height="900"
+          />
         </div>
         <div class="article-copy">
-          <p class="article-meta">LLM / MULTI-AGENT / COORDINATION · 2026.09.01</p>
-          <h3>全員「誰かがやる」と考えた結果、誰もやらなかった</h3>
-          <p>課題の重要性は理解した。それでも担当者は0人。4人の判断ログから、協調失敗が生まれた過程を追います。</p>
+          <p class="article-meta">GUITAR AI / DATASET / COMPUTER VISION · 2026.09.01</p>
+          <h3>AIの学習データが足りないので、自分のギターを5,000枚に増やした</h3>
+          <p>グリーンバック、白壁、cutout、背景合成。5,000枚のSynthetic Datasetを作るまでと、その限界。</p>
           <strong>Read Article →</strong>
         </div>
       </a>
@@ -136,10 +140,6 @@ const projects = [
   .article-preview:hover { transform: translateY(-3px); border-color: var(--border-strong); box-shadow: var(--shadow-soft); }
   .article-thumb { min-height: 340px; background: var(--media-bg); }
   .article-thumb img { width: 100%; height: 100%; display: block; object-fit: cover; }
-  .responsibility-thumb { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: center; padding: clamp(26px, 5vw, 54px); background: linear-gradient(135deg, #eaf2ec, #dfeae2); }
-  .mini-agents { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .mini-agents span { display: grid; place-items: center; aspect-ratio: 1; border: 1px solid #c7d7cc; border-radius: 14px; background: rgba(255,255,255,.58); color: var(--accent); font-size: .76rem; font-weight: 850; }
-  .responsibility-thumb > strong { color: #26352b; font-size: clamp(2.6rem, 6vw, 5.2rem); line-height: .85; letter-spacing: -.07em; }
   .article-copy { display: flex; flex-direction: column; justify-content: center; padding: clamp(28px, 5vw, 52px); }
   .article-meta { margin: 0 0 20px; color: var(--accent); font-size: .7rem; font-weight: 700; letter-spacing: .08em; }
   .article-copy h3 { margin: 0; font-size: clamp(1.7rem, 3.2vw, 2.8rem); line-height: 1.25; letter-spacing: -.04em; text-wrap: balance; word-break: auto-phrase; }
