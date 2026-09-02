@@ -1,0 +1,488 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const title = "LLMに世界を任せすぎると壊れるので、Pythonを「神」にした";
+const description =
+  "継承する村では、LLMに意思決定の自由を与えつつ、座標・HP・戦闘・死亡など世界の事実はPythonが管理します。自由と検証可能性を両立するための設計を振り返ります。";
+const repoUrl = "https://github.com/tattoqq9/inheritance-village";
+---
+
+<BaseLayout title={`${title} | TATTO LAB`} description={description}>
+  <main>
+    <article>
+      <header class="article-header">
+        <a class="back" href="/articles">← Articles</a>
+        <p class="eyebrow">INHERITANCE VILLAGE / SYSTEM DESIGN</p>
+        <h1><span>LLMに世界を任せすぎると壊れるので、</span><span>Pythonを「神」にした</span></h1>
+        <p class="lead">
+          LLMは何をしたいかを決める。でも、世界で本当に何が起きたかを決めるのはPython。この境界を作るまでに、かなり失敗しました。
+        </p>
+        <div class="meta">
+          <time datetime="2026-09-02">2026.09.02</time>
+          <span>LLM / Agent Architecture / Simulation</span>
+        </div>
+
+        <div class="hero-diagram" aria-label="LLMとPythonの責任分界">
+          <div class="authority-card llm-card">
+            <span>RESIDENT</span>
+            <strong>LLM</strong>
+            <p>目的、行動選択、会話、理由、記憶、感情</p>
+          </div>
+          <div class="boundary-mark"><b>選択</b><i>→</i><b>検証</b></div>
+          <div class="authority-card python-card">
+            <span>WORLD AUTHORITY</span>
+            <strong>Python</strong>
+            <p>座標、時刻、HP、食料、戦闘、死亡、世代交代</p>
+          </div>
+        </div>
+      </header>
+
+      <div class="prose">
+        <p>
+          LLMで動く村人たちのシミュレーションを作るとき、最初に考えなければならなかったことがあります。
+        </p>
+
+        <blockquote>LLMを、どこまで信用するか。</blockquote>
+
+        <p>
+          例えば村人に「今何をしますか？」と聞くと、「食料を村へ納品します」「ダンジョンの武器庫へ向かいます」「魔物と戦います」と答えます。
+        </p>
+
+        <p>
+          ここまでは問題ありません。でも、その村人がまだ森の中にいたら？ 武器庫に武器がもう残っていなかったら？ そもそも魔物のいる場所に到着していなかったら？
+        </p>
+
+        <p>
+          LLMが「できました」と言ったからといって、本当にできたことにしてしまうと、シミュレーションの世界そのものがLLMの文章に引っ張られて壊れてしまいます。
+        </p>
+
+        <p>
+          そこで「継承する村」では、<strong>LLMは何をしたいかを決める。世界で実際に何が起きたかはPythonが決める。</strong>という分離をかなり強く入れました。
+        </p>
+
+        <h2>LLMは住民であって、世界そのものではない</h2>
+
+        <p>
+          このシミュレーションでは、4人の村人をそれぞれLLMで動かしています。毎step、村人には現在地、時刻、所持品、HP、現在の目的、近くのAgentなどを見せます。
+        </p>
+
+        <div class="state-card" aria-label="LLMへ提示する状態の例">
+          <span>CURRENT STATE</span>
+          <dl>
+            <div><dt>現在地</dt><dd>deep_forest</dd></div>
+            <div><dt>時刻</dt><dd>Day 2 / 昼</dd></div>
+            <div><dt>所持食料</dt><dd>6</dd></div>
+            <div><dt>HP</dt><dd>12</dd></div>
+            <div><dt>現在の目的</dt><dd>食料確保</dd></div>
+          </dl>
+        </div>
+
+        <p>
+          そしてLLMは、今の目的、次に何をするか、誰を対象にするか、仲間に何を話すか、なぜそう考えたか、個人記憶に何を残すかを返します。
+        </p>
+
+        <p>
+          しかし、<strong>座標やHP、食料数までLLM自身に決めさせることはしません。</strong>そこはPython側が管理します。
+        </p>
+
+        <div class="responsibility-grid">
+          <section>
+            <span>LLMが決める</span>
+            <ul>
+              <li>長期目的と当面の目的</li>
+              <li>候補からの行動・対象選択</li>
+              <li>戦う・待つ・撤退する方針</li>
+              <li>会話、判断理由、個人記憶</li>
+              <li>感情を含む日記と次世代戦略</li>
+            </ul>
+          </section>
+          <section>
+            <span>Pythonが確定する</span>
+            <ul>
+              <li>座標、場所、時刻、昼夜</li>
+              <li>移動結果、所持量、鍋の量</li>
+              <li>HP、攻撃、戦闘ラウンド、死亡</li>
+              <li>武器庫在庫、装備、素材</li>
+              <li>世代境界と最終判定</li>
+            </ul>
+          </section>
+        </div>
+
+        <p>
+          つまりLLMは「私はこうしたい」とは言える。でも、<strong>「だから世界はこうなった」とは決められない。</strong>この役割分担にしました。
+        </p>
+
+        <h2>「食料を納品する」と言われても、まずPythonが確認する</h2>
+
+        <p>
+          村人が <code>deposit_food</code> を選んだとしても、その瞬間に納品を成立させません。
+        </p>
+
+        <div class="verify-flow" aria-label="行動選択から実行結果までの検証フロー">
+          <div><span>01</span><strong>LLM</strong><p>deposit_food を選ぶ</p></div>
+          <b>→</b>
+          <div><span>02</span><strong>Python</strong><p>本当に村にいる？</p></div>
+          <b>→</b>
+          <div><span>03</span><strong>Python</strong><p>食料を持っている？</p></div>
+          <b>→</b>
+          <div><span>04</span><strong>RESULT</strong><p>可能なら状態を更新</p></div>
+        </div>
+
+        <p>
+          森の中にいるのに <code>deposit_food</code> を選んでも納品は成立しません。LLMがどれだけ自信満々に「村へ無事に食料を届けた」と話していても、Pythonのログ上で納品されていなければ、<strong>納品していません。</strong>
+        </p>
+
+        <h2>これを入れないと、実験結果を信用できなくなる</h2>
+
+        <p>
+          世代間継承を調べたいとします。第1世代が失敗し、第2世代がその日記を読んだ結果、「素材納品に成功した」とLLMが話した。
+        </p>
+
+        <p>
+          これだけでは、継承が効いた証拠にはなりません。確認したいのは、Agentが成功したと言ったかではなく、Python上で素材を持って村へ到着し、<code>deposit_material</code> が実行され、素材在庫が実際に増えたかです。
+        </p>
+
+        <div class="evidence-card">
+          <div><span>弱い証拠</span><strong>「成功しました」</strong><p>LLMが生成した自己申告</p></div>
+          <b>≠</b>
+          <div><span>強い証拠</span><strong>material 0 → 1</strong><p>Pythonが確定した状態遷移</p></div>
+        </div>
+
+        <p>
+          G18で初めて素材課題が完遂したことも、固定版G2がDay 3に素材を納品したことも、最終的にはLLMの文章ではなくPythonイベントを基準に判定しています。
+        </p>
+
+        <p>
+          「誰が事実を決めるのか」を固定しておかないと、<strong>LLMの物語生成能力を、タスク達成能力と勘違いする</strong>可能性があります。
+        </p>
+
+        <h2>では全部Pythonで決めればいいのでは？</h2>
+
+        <p>
+          ここで逆の疑問が出てきます。それなら、食料を持ったら自動で村へ帰す、村に着いたら自動で納品する、素材が足りなければAgent 0をダンジョンへ送る、とすればかなり安定します。
+        </p>
+
+        <p>
+          実際、その方がゲームとしては簡単に作れます。でも今回は、それをなるべくやらないことにしました。見たいのは、<strong>LLM自身がどんな判断をするのか</strong>だからです。
+        </p>
+
+        <div class="spectrum" aria-label="LLMの自由度とPythonの強制のバランス">
+          <div class="spectrum-labels"><span>自由すぎる</span><span>現在の設計</span><span>強制しすぎる</span></div>
+          <div class="spectrum-track"><i></i></div>
+          <div class="spectrum-notes"><span>Schema失敗まで<br />能力不足に見える</span><strong>物理的に不可能だけ除外</strong><span>Pythonが<br />正解を教えてしまう</span></div>
+        </div>
+
+        <h2>Pythonは「正しい行動」を教えない</h2>
+
+        <p>
+          研究用設定では、戦略的な行動ガードレールを基本的にOFFにしています。食料を持っているから帰れ、夜が近いから村へ戻れ、素材が必要だからAgent 3がダンジョン担当、といった上書きはしません。
+        </p>
+
+        <p>
+          これらを全部Python側でやってしまうと、LLMが賢かったのか、Pythonのルールが賢かったのか分からなくなるからです。
+        </p>
+
+        <blockquote>物理的に不可能な選択肢は除く。戦略的に悪い選択肢は残す。</blockquote>
+
+        <p>
+          今のところ、この境界を基本にしています。「その行動はできない」はPythonが言う。でも「その行動はやめた方がいい」まではPythonは言わない。
+        </p>
+
+        <h2>ただし「不可能なこと」は許さない</h2>
+
+        <p>
+          自由だからといって、壁の向こうへの瞬間移動、隣接していない部屋への移動、空の武器庫から武器を取る、武器を持っていないのに「武器を持って帰る」を選ぶ、といった行動まで許すわけではありません。
+        </p>
+
+        <div class="loop-diagram">
+          <div><span>1</span><strong>何をしたい？</strong><p>LLMが選ぶ</p></div>
+          <b>→</b>
+          <div><span>2</span><strong>実行可能？</strong><p>Pythonが検証</p></div>
+          <b>→</b>
+          <div><span>3</span><strong>何が起きた？</strong><p>Pythonが確定</p></div>
+          <b>→</b>
+          <div><span>4</span><strong>次はどうする？</strong><p>再びLLMへ</p></div>
+        </div>
+
+        <h2>ダンジョンでは「戦略の失敗」と「APIの失敗」が混ざった</h2>
+
+        <p>
+          この境界が特に難しかったのがダンジョンでした。最初はLLMに「次にどこへ移動しますか？」と比較的自由に指定させていました。
+        </p>
+
+        <p>
+          すると、存在しない部屋を指定する、隣接していない部屋へ移動しようとする、targetが空になる、といった問題が出ました。
+        </p>
+
+        <div class="dungeon-stat">
+          <span>ある世代の dungeon_move</span>
+          <strong>33回中 20回</strong>
+          <p>target が <code>None</code> になった</p>
+        </div>
+
+        <p>
+          これでは、LLMが探索戦略に失敗しているのか、単にインターフェースの使い方に失敗しているのか分かりません。
+        </p>
+
+        <p>
+          そこでPythonが、現在地と隣接ノードから<strong>実行可能な候補だけを生成</strong>し、LLMにはその中から選ばせるようにしました。
+        </p>
+
+        <div class="candidate-card">
+          <span>CURRENT NODE</span>
+          <strong>hall</strong>
+          <div><b>選択可能</b><code>entrance</code><code>passage_1</code></div>
+          <p>「passage_1へ行け」と教えているのではなく、存在しない移動だけを候補から除いている。</p>
+        </div>
+
+        <p>
+          このとき気付いたのが、<strong>戦略の自由と、API操作の自由は別</strong>だということでした。
+        </p>
+
+        <h2>戦闘も全部LLMにはやらせなかった</h2>
+
+        <p>
+          魔物との戦闘も同じです。LLMには戦う、仲間を待つ、撤退するといった判断をさせます。一方、攻撃力6ならHPを6減らす、といった反復計算はPythonが処理します。
+        </p>
+
+        <div class="combat-split">
+          <div><span>DECISION</span><strong>戦う？ 待つ？ 撤退？</strong><p>LLM</p></div>
+          <b>→</b>
+          <div><span>PHYSICS</span><strong>HP -6 / HP -4</strong><p>Python</p></div>
+          <b>→</b>
+          <div><span>NEXT DECISION</span><strong>結果を見て次を選ぶ</strong><p>LLM</p></div>
+        </div>
+
+        <p>
+          4人・5日では最大約1,100回の行動判断があります。創造性が不要なダメージ計算までLLMへ問い合わせると、実験時間もさらに伸びます。
+        </p>
+
+        <h2>Pythonを「神」にした、という感覚</h2>
+
+        <p>
+          開発中、このPython側の役割は「世界の神」に近いなと思うようになりました。ただし、「こう生きなさい」と命令する神ではありません。
+        </p>
+
+        <div class="laws-grid" aria-label="Pythonが維持する世界法則">
+          <div>時間は進む</div>
+          <div>夜になる</div>
+          <div>食料不足なら死ぬ</div>
+          <div>攻撃されればHPが減る</div>
+          <div>空の武器庫から武器は出ない</div>
+          <div>死んだ人は動かない</div>
+        </div>
+
+        <p>
+          つまりPythonは、<strong>世界の法則だけを維持する存在</strong>です。村人が危険だから家にいるのも自由。他人に任せて食料へ行くのも自由。その結果、前の記事のように責任分散が起きてもPythonは助けません。
+        </p>
+
+        <h2>この設計のおかげで、失敗を「考え」と「事実」に分けて追える</h2>
+
+        <p>
+          Pythonが権威的な状態を持っていることで、ログも役割別に分離して残せるようになりました。
+        </p>
+
+        <div class="log-grid">
+          <div><code>world_frames.jsonl</code><p>位置、HP、所持品、目的</p></div>
+          <div><code>events.jsonl</code><p>移動、採取、納品、死亡</p></div>
+          <div><code>messages.jsonl</code><p>Agent同士の会話</p></div>
+          <div><code>memory_reasoning.jsonl</code><p>目的、理由、記憶</p></div>
+          <div><code>diary.jsonl</code><p>感情を含む主観日記</p></div>
+          <div><code>failure_reports.jsonl</code><p>Pythonの客観的失敗報告</p></div>
+        </div>
+
+        <p>
+          そのため、本人は何を考えていたか、何を選んだか、実際には何が起きたか、次の日記でどう解釈したか、を後から別々に追えます。
+        </p>
+
+        <p>
+          前の記事で書いた「全員が誰かがやると思った結果、誰もやらなかった」という協調失敗も、この複数ログを同時に残していたから特定できました。
+        </p>
+
+        <h2>もちろん、Python側の情報が間違っていたこともある</h2>
+
+        <p>
+          「Pythonが神だから絶対に正しい」わけでもありません。開発中には、PythonからLLMへ渡す情報にもバグがありました。
+        </p>
+
+        <p>
+          例えば食料の携行容量です。深い森では一時的に6個まで運べる設計だったのですが、日記用の記録には基本容量3だけが残っていました。
+        </p>
+
+        <div class="contradiction-card">
+          <div><span>LLMへ見せた記録</span><strong>capacity = 3</strong></div>
+          <b>なのに</b>
+          <div><span>実際の行動記録</span><strong>carried = 6</strong></div>
+        </div>
+
+        <p>
+          27Bの村人は、この矛盾を日記の中で指摘しました。これはLLMの推論ミスではありません。<strong>LLMへ見せていた世界の説明の方が間違っていました。</strong>
+        </p>
+
+        <h2>「AIが変なことをした」で終わらせない</h2>
+
+        <p>
+          LLMエージェントが奇妙な行動をすると、つい「AIが馬鹿な判断をした」と思いたくなります。でも実際には、モデル能力だけでなく、プロンプト、Schema、候補生成、世界状態、記憶、表示情報、実際の物理ルールのどこかに原因があるかもしれません。
+        </p>
+
+        <div class="debug-grid">
+          <span>MODEL</span><span>PROMPT</span><span>SCHEMA</span><span>CANDIDATES</span><span>WORLD STATE</span><span>MEMORY</span><span>DISPLAY</span><span>RULES</span>
+        </div>
+
+        <p>
+          「武器庫へ行かない」という現象ひとつでも、本当に武器を必要だと思っていない、担当を他人へ任せた、ダンジョンが遠すぎる、夜が怖い、地図が分かりにくい、target Schemaが壊れている、と原因はかなり違います。
+        </p>
+
+        <blockquote>AIの失敗を観察したいなら、AI以外の部分をなるべく監査可能にする。</blockquote>
+
+        <h2>LLMに自由を与えるために、自由に変更できない世界を作った</h2>
+
+        <p>
+          今回、LLMシミュレーションを作っていて意外だったのは、モデルそのものより、世界のルールとインターフェースを作る時間がかなり長かったことです。
+        </p>
+
+        <p>
+          どこまで住民に知らせるか。どこから先を住民自身に考えさせるか。何を物理法則として固定するか。どんな失敗なら観察対象として残し、どんな失敗は単なるAPIエラーとして除外するか。
+        </p>
+
+        <p>
+          最終的には、<strong>LLMに自由を与えるために、LLMが自由に変更できない世界を先に作る</strong>必要がありました。少し矛盾しているようですが、今回の2週間でかなり重要だった発見です。
+        </p>
+
+        <div class="article-end">
+          <p class="eyebrow">TATTO LAB / INHERITANCE VILLAGE</p>
+          <p>前の記事では、4人が「他の誰かがやる」と考えた結果、担当者が0人になった協調失敗を掘り下げています。</p>
+          <div class="end-links">
+            <a href="/articles/inheritance-village-responsibility-diffusion">協調失敗の記事を読む →</a>
+            <a href="/articles/inheritance-village-two-weeks">2週間の開発記を読む →</a>
+            <a href="/projects/agent-society">Inheritance Village Project →</a>
+            <a href={repoUrl} target="_blank" rel="noreferrer">GitHub repository ↗</a>
+          </div>
+        </div>
+      </div>
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  main { width: min(var(--content-wide), calc(100% - 40px)); margin: 0 auto; }
+  article { padding-bottom: 40px; }
+  .article-header { display: block; width: 100%; max-width: 1040px; min-height: 0; margin: 0; padding: 72px 0 48px; }
+  .back { display: inline-block; margin-bottom: 72px; color: var(--text-subtle); font-size: .82rem; }
+  .back:hover { color: var(--accent); }
+  .eyebrow { margin: 0 0 18px; font-size: .72rem; font-weight: 800; letter-spacing: .18em; }
+  h1 { max-width: 1080px; margin: 0; font-size: clamp(2.3rem, 3.7vw, 3rem); line-height: 1.14; letter-spacing: -.045em; text-wrap: balance; word-break: auto-phrase; }
+  h1 span { display: block; }
+  .lead { max-width: 800px; margin: 34px 0 24px; color: var(--text-muted); font-size: clamp(1.15rem, 2.5vw, 1.52rem); line-height: 1.8; }
+  .meta { display: flex; gap: 18px; color: var(--text-subtle); font-size: .78rem; }
+  .prose { width: min(var(--content-text), 100%); margin: 72px 0 0; }
+  .prose > p, .prose > ul { color: var(--text-muted); font-size: 1.055rem; line-height: 2.05; }
+  .prose > p { margin: 0 0 30px; }
+  .prose strong { color: var(--text); font-weight: 750; }
+  h2 { margin: 100px 0 32px; color: var(--text); font-size: clamp(1.9rem, 3.8vw, 2.8rem); line-height: 1.3; letter-spacing: -.035em; text-wrap: balance; word-break: auto-phrase; }
+  blockquote { margin: 46px 0; padding: 25px 30px; border-left: 3px solid var(--accent); background: var(--accent-soft); color: var(--text); font-size: clamp(1.2rem, 2.8vw, 1.62rem); font-weight: 750; line-height: 1.65; }
+  code { padding: .12em .38em; border-radius: 6px; background: var(--surface-subtle); color: var(--text); font-size: .88em; }
+
+  .hero-diagram { display: grid; grid-template-columns: 1fr auto 1fr; gap: 18px; align-items: stretch; margin: 56px 0 0; }
+  .authority-card { min-height: 230px; padding: 34px; border: 1px solid var(--border); border-radius: 22px; display: flex; flex-direction: column; justify-content: center; }
+  .llm-card { background: var(--surface); }
+  .python-card { background: linear-gradient(135deg, #e8f1ea, #dfeadf); border-color: #cbdacc; }
+  .authority-card span { color: var(--accent); font-size: .68rem; font-weight: 850; letter-spacing: .14em; }
+  .authority-card strong { margin: 8px 0 10px; font-size: clamp(2.5rem, 6vw, 5rem); line-height: .92; letter-spacing: -.065em; }
+  .authority-card p { margin: 0; color: var(--text-muted); line-height: 1.7; }
+  .boundary-mark { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; color: var(--text-subtle); font-size: .68rem; letter-spacing: .08em; }
+  .boundary-mark i { font-style: normal; font-size: 1.4rem; }
+
+  .state-card { margin: 42px 0; padding: 28px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
+  .state-card > span { color: var(--accent); font-size: .67rem; font-weight: 850; letter-spacing: .13em; }
+  .state-card dl { margin: 20px 0 0; }
+  .state-card dl div { display: grid; grid-template-columns: 160px 1fr; gap: 16px; padding: 10px 0; border-top: 1px solid var(--border); }
+  .state-card dt { color: var(--text-subtle); }
+  .state-card dd { margin: 0; color: var(--text); font-weight: 700; }
+
+  .responsibility-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 44px 0; }
+  .responsibility-grid section { padding: 30px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
+  .responsibility-grid section:last-child { background: var(--accent-soft); border-color: #cfe1d4; }
+  .responsibility-grid span { color: var(--accent); font-size: .7rem; font-weight: 850; letter-spacing: .12em; }
+  .responsibility-grid ul { margin: 18px 0 0; padding-left: 1.1rem; color: var(--text-muted); line-height: 1.9; }
+
+  .verify-flow, .loop-diagram, .combat-split { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; gap: 10px; align-items: center; margin: 44px 0; }
+  .verify-flow div, .loop-diagram div, .combat-split div { min-height: 120px; padding: 20px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+  .verify-flow span, .loop-diagram span, .combat-split span { display: block; color: var(--accent); font-size: .65rem; font-weight: 850; letter-spacing: .1em; }
+  .verify-flow strong, .loop-diagram strong, .combat-split strong { display: block; margin: 7px 0; font-size: .92rem; }
+  .verify-flow p, .loop-diagram p, .combat-split p { margin: 0; color: var(--text-muted); font-size: .78rem; line-height: 1.55; }
+  .verify-flow > b, .loop-diagram > b, .combat-split > b { color: var(--text-subtle); font-weight: 500; }
+
+  .evidence-card, .contradiction-card { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin: 44px 0; }
+  .evidence-card div, .contradiction-card div { padding: 26px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
+  .evidence-card div:last-child { background: var(--accent-soft); border-color: #cfe1d4; }
+  .evidence-card span, .contradiction-card span { display: block; color: var(--text-subtle); font-size: .7rem; }
+  .evidence-card strong, .contradiction-card strong { display: block; margin: 8px 0; font-size: 1.35rem; letter-spacing: -.025em; }
+  .evidence-card p { margin: 0; color: var(--text-muted); font-size: .82rem; }
+  .evidence-card > b, .contradiction-card > b { color: var(--text-subtle); }
+
+  .spectrum { margin: 48px 0; padding: 30px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); }
+  .spectrum-labels, .spectrum-notes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .spectrum-labels { font-size: .72rem; font-weight: 800; }
+  .spectrum-labels span:nth-child(2), .spectrum-notes strong { text-align: center; color: var(--accent); }
+  .spectrum-labels span:last-child, .spectrum-notes span:last-child { text-align: right; }
+  .spectrum-track { position: relative; height: 8px; margin: 18px 0; border-radius: 999px; background: linear-gradient(90deg, #dfe3e0, #90c9a3, #dfe3e0); }
+  .spectrum-track i { position: absolute; left: 50%; top: 50%; width: 18px; height: 18px; border: 4px solid white; border-radius: 50%; background: var(--accent); transform: translate(-50%, -50%); box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+  .spectrum-notes { color: var(--text-subtle); font-size: .76rem; line-height: 1.6; }
+
+  .dungeon-stat { width: min(560px, 100%); margin: 40px 0; padding: 30px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
+  .dungeon-stat span { display: block; color: var(--text-subtle); font-size: .72rem; }
+  .dungeon-stat strong { display: block; margin: 6px 0; font-size: clamp(2.2rem, 7vw, 4rem); letter-spacing: -.06em; }
+  .dungeon-stat p { margin: 0; color: var(--text-muted); }
+
+  .candidate-card { margin: 42px 0; padding: 28px; border: 1px solid #cfe1d4; border-radius: 18px; background: var(--accent-soft); }
+  .candidate-card > span { color: var(--accent); font-size: .67rem; font-weight: 850; letter-spacing: .12em; }
+  .candidate-card > strong { display: block; margin: 5px 0 20px; font-size: 2rem; }
+  .candidate-card > div { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .candidate-card > div b { margin-right: 8px; font-size: .82rem; }
+  .candidate-card p { margin: 20px 0 0; color: var(--text-muted); line-height: 1.8; }
+
+  .combat-split { grid-template-columns: 1fr auto 1fr auto 1fr; }
+
+  .laws-grid, .log-grid, .debug-grid { display: grid; gap: 10px; margin: 42px 0; }
+  .laws-grid { grid-template-columns: repeat(3, 1fr); }
+  .laws-grid div { min-height: 95px; display: grid; place-items: center; padding: 18px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); text-align: center; font-weight: 750; }
+  .log-grid { grid-template-columns: repeat(2, 1fr); }
+  .log-grid div { padding: 22px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+  .log-grid code { padding: 0; background: transparent; color: var(--accent); font-weight: 750; }
+  .log-grid p { margin: 8px 0 0; color: var(--text-muted); font-size: .82rem; }
+  .debug-grid { grid-template-columns: repeat(4, 1fr); }
+  .debug-grid span { padding: 18px 8px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); text-align: center; color: var(--text-subtle); font-size: .67rem; font-weight: 850; letter-spacing: .07em; }
+
+  .article-end { width: min(900px, calc(100vw - 40px)); margin: 100px 0 0; padding: 34px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); }
+  .article-end > p:not(.eyebrow) { color: var(--text-muted); line-height: 1.8; }
+  .end-links { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 22px; }
+  .end-links a { color: var(--accent); font-size: .84rem; font-weight: 750; }
+
+  @media (max-width: 820px) {
+    h1 span { display: inline; }
+    h1 span + span::before { content: " "; }
+    .hero-diagram { grid-template-columns: 1fr; }
+    .boundary-mark { flex-direction: row; }
+    .responsibility-grid { grid-template-columns: 1fr; }
+    .verify-flow, .loop-diagram { grid-template-columns: 1fr; }
+    .verify-flow > b, .loop-diagram > b { justify-self: center; transform: rotate(90deg); }
+    .combat-split { grid-template-columns: 1fr; }
+    .combat-split > b { justify-self: center; transform: rotate(90deg); }
+  }
+
+  @media (max-width: 700px) {
+    .article-header { padding-top: 48px; }
+    .back { margin-bottom: 52px; }
+    .meta { flex-direction: column; gap: 6px; }
+    .prose { margin-top: 48px; }
+    h2 { margin-top: 76px; }
+    blockquote { padding: 22px; margin-inline: 0; }
+    .state-card dl div { grid-template-columns: 1fr; gap: 3px; }
+    .evidence-card, .contradiction-card { grid-template-columns: 1fr; }
+    .evidence-card > b, .contradiction-card > b { justify-self: center; }
+    .spectrum { padding: 22px; }
+    .spectrum-labels, .spectrum-notes { gap: 8px; font-size: .66rem; }
+    .laws-grid, .log-grid, .debug-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
