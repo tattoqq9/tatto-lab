@@ -35,7 +35,9 @@ const {
 
 const site = Astro.site ?? new URL("https://tatto-lab.pages.dev");
 const normalizedPath =
-  Astro.url.pathname === "/" ? "/" : Astro.url.pathname.replace(/\/+$/, "");
+  Astro.url.pathname === "/"
+    ? "/"
+    : `${Astro.url.pathname.replace(/\/+$/, "")}/`;
 const canonicalUrl = new URL(normalizedPath, site);
 const absoluteImage = image ? new URL(image, site).href : undefined;
 const robotsContent = noindex
