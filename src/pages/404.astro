@@ -1,0 +1,49 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Page not found | TATTO LAB"
+  description="お探しのページは見つかりませんでした。"
+  noindex={true}
+>
+  <main class="not-found">
+    <p class="eyebrow">404</p>
+    <h1>Page not found</h1>
+    <p>お探しのページは見つかりませんでした。</p>
+    <a href="/">TATTO LABへ戻る →</a>
+  </main>
+</BaseLayout>
+
+<style>
+  .not-found {
+    width: min(760px, calc(100% - 40px));
+    min-height: 70vh;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .eyebrow {
+    margin: 0 0 14px;
+    color: var(--accent);
+    font-size: .75rem;
+    font-weight: 800;
+    letter-spacing: .18em;
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(3rem, 8vw, 6rem);
+    line-height: 1;
+    letter-spacing: -.05em;
+  }
+  p:not(.eyebrow) {
+    margin: 24px 0;
+    color: var(--text-muted);
+    line-height: 1.8;
+  }
+  a {
+    color: var(--accent);
+    font-weight: 700;
+  }
+</style>
