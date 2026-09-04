@@ -1,16 +1,34 @@
-# TATTO LAB Light Theme v2 Patch
+# TATTO LAB Umami Analytics patch
 
-Only two files are replaced:
+This patch adds Umami Cloud tracking to `src/layouts/BaseLayout.astro`.
 
-- `src/pages/index.astro`
-- `src/pages/articles/virtual-guitar-ai.astro`
+Tracking is limited to the production domain:
 
-Changes:
-- Smaller, controlled Home hero title with intentional line breaks on desktop.
-- Smaller article title with intentional two-line desktop layout.
-- Smaller article H2 headings.
-- `text-wrap: balance` / `word-break: auto-phrase` for Japanese headings.
-- Home project placeholder panels changed from dark blocks to light editorial surfaces.
-- Slightly tighter mobile sizing.
+- `tatto-lab.pages.dev`
 
-Apply by copying the contents of this directory over the repository root.
+Therefore local development at `localhost:4321` is not counted.
+
+## Install (WSL)
+
+```bash
+cd ~/projects/tatto-lab
+rm -rf /tmp/tatto-umami
+unzip -q /mnt/c/Users/uchig/Downloads/tatto-lab-umami-patch.zip -d /tmp/tatto-umami
+cp -a /tmp/tatto-umami/tatto-lab-umami-patch/. ~/projects/tatto-lab/
+```
+
+Then verify:
+
+```bash
+npm run build
+git diff --check
+git diff -- src/layouts/BaseLayout.astro
+```
+
+If correct:
+
+```bash
+git add src/layouts/BaseLayout.astro
+git commit -m "Add Umami analytics"
+git push
+```
