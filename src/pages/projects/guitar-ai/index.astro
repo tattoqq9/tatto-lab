@@ -18,11 +18,12 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       <div class="demo-panel">
         <div>
           <p class="demo-kicker">LATEST ARTICLE</p>
-          <h2>自分のギターを5,000枚に増やした。</h2>
-          <p>グリーンバック、白壁、cutout、背景合成。GuitarSynthetic_v1を5,000 samplesまで増やした過程と、Syntheticだけでは実演奏に届かなかった理由をまとめました。</p>
+          <h2>失敗する場面ばかり集めて学習させた。</h2>
+          <p>モデルが苦手な条件を狙ってHard Caseを追加し、Real Dataを633枚から1,868枚へ。Hard Val 683でIoU 0.2300→0.4868、BF1@2 0.1874→0.4529まで改善した過程をまとめました。</p>
           <div class="demo-links">
-            <a href="/articles/synthetic-guitar-dataset">第二号記事を読む →</a>
-            <a href="/articles/virtual-guitar-ai">第一号記事：Virtualな演奏動画へ →</a>
+            <a href="/articles/guitar-hard-cases">第三号記事を読む →</a>
+            <a href="/articles/synthetic-guitar-dataset">第二号：Synthetic Data 5,000枚 →</a>
+            <a href="/articles/virtual-guitar-ai">第一号：Virtualな演奏動画へ →</a>
           </div>
         </div>
       </div>
@@ -71,9 +72,9 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         <div><strong>0.832</strong><span>Final Playing IoU</span></div>
         <div><strong>0.907</strong><span>Dice</span></div>
         <div><strong>0.843</strong><span>BF1@2</span></div>
-        <div><strong>541</strong><span>Test Frames</span></div>
+        <div><strong>180</strong><span>Corrected Final Frames</span></div>
       </div>
-      <p class="note">現在のSYN25条件を、学習に使っていない演奏動画541フレームで評価した値です。</p>
+      <p class="note">現在のSYN25条件を、正式なFinal Playing corrected180で評価した値です。</p>
     </section>
 
     <section class="content next">
@@ -81,6 +82,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       <h2>切り抜くことの先へ。</h2>
       <p>手・腕・長袖との接触境界をさらに改善しながら、MediaPipe Handsとの統合やリアルタイム化を進めます。</p>
       <div class="next-links">
+        <a href="/articles/guitar-hard-cases">第三号記事を読む →</a>
         <a href="/articles/synthetic-guitar-dataset">第二号記事を読む →</a>
         <a href="/articles/virtual-guitar-ai">第一号記事を読む →</a>
       </div>

@@ -1,0 +1,365 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const title = "AIが失敗する場面ばかり集めて学習させたら、かなり改善した";
+const description =
+  "ギター画像セグメンテーションで失敗条件を分析し、手・腕・袖・接触境界などのHard Caseを1,235枚追加。Real 633→1,868でHard Val 683のIoUが0.2300→0.4868へ改善した過程をまとめます。";
+---
+
+<BaseLayout
+  title={`${title} | TATTO LAB`}
+  seoTitle="画像セグメンテーションのHard Example Mining｜失敗例を集めて改善 | TATTO LAB"
+  description={description}
+  type="article"
+  headline={title}
+  publishedTime="2026-09-05"
+  image="/images/guitar-ai/article-01/04_hardcase_633_vs_1868.webp"
+  imageAlt="Real 633枚とHard Case追加後のReal 1,868枚でギター画像セグメンテーション性能を比較した図"
+>
+  <main>
+    <article>
+      <header class="article-header">
+        <a class="back" href="/articles">← Articles</a>
+        <p class="eyebrow">GUITAR AI / HARD CASES / COMPUTER VISION</p>
+        <h1>
+          <span>AIが失敗する場面ばかり集めて学習させたら、</span>
+          <span>かなり改善した</span>
+        </h1>
+        <p class="lead">
+          モデルを変える前に、モデルが何を間違えているのかを集め直した。
+        </p>
+        <div class="meta">
+          <time datetime="2026-09-05">2026.09.05</time>
+          <span>Research / Development</span>
+        </div>
+
+        <figure class="hero-media">
+          <img
+            src="/images/guitar-ai/article-01/04_hardcase_633_vs_1868.webp"
+            alt="Real 633枚とHard Case追加後のReal 1,868枚でギター画像セグメンテーション性能を比較した図"
+            width="1600"
+            height="900"
+          />
+        </figure>
+      </header>
+
+      <div class="prose">
+        <p>
+          ギターを切り抜くAIを作り始めたころ、精度が足りなければ、もっと良いモデルを試せばいいと思っていました。
+        </p>
+
+        <p>
+          実際、モデル側でもいろいろ試しています。でも実際の演奏映像を見続けていると、別のことが気になってきました。
+        </p>
+
+        <blockquote>
+          失敗する場面が、毎回だいたい同じなのでは？
+        </blockquote>
+
+        <p>
+          手がネックに重なる。腕がボディの前を通る。長袖とギターが接触する。背景や人だけのフレームをギターだと誤認する。
+          きれいに写っているギターではなく、<strong>境界が曖昧になる場面で繰り返し崩れていました。</strong>
+        </p>
+
+        <p>
+          そこで今回は、平均的な画像をさらに増やすのではなく、
+          <strong>AIが苦手な条件そのものを集めて学習データへ追加する</strong>ことにしました。
+        </p>
+
+        <h2>最初のReal Dataは633枚だった</h2>
+
+        <p>
+          実写の演奏環境から作った最初の学習データは633枚でした。
+          自分のギターを実際に持った状態を学習できるので、Synthetic Dataだけより現実の条件に近づけます。
+        </p>
+
+        <p>
+          ただし、633枚の中にすべての難しい条件が十分入っているわけではありません。
+          普通に写っているフレームが多ければ、モデルは普通の場面では上手くなります。
+          それでも、実際に使いたい動画の中で数秒おきに現れる難しい境界が弱いまま残ります。
+        </p>
+
+        <div class="dataset-flow" aria-label="Real Datasetの増加">
+          <div>
+            <span>START</span>
+            <strong>633</strong>
+            <small>Real train</small>
+          </div>
+          <b>＋</b>
+          <div>
+            <span>TARGETED</span>
+            <strong>1,235</strong>
+            <small>Hard-case train</small>
+          </div>
+          <b>＝</b>
+          <div class="emphasis">
+            <span>REAL</span>
+            <strong>1,868</strong>
+            <small>training images</small>
+          </div>
+        </div>
+
+        <p>
+          ここで重要なのは、単に633枚を1,868枚へ増やしたことではありません。
+          <strong>追加した1,235枚を、これまで失敗していた条件に寄せた</strong>ことです。
+        </p>
+
+        <h2>「難しい画像」を先に決めるのではなく、失敗から探した</h2>
+
+        <p>
+          Hard Caseと言っても、「暗い画像」「ぼけた画像」のような一般的な難易度だけを決めて集めたわけではありません。
+          実際の推論結果を見て、モデルが崩れる条件を拾っていきました。
+        </p>
+
+        <div class="failure-grid">
+          <div><span>01</span><strong>手で隠れる</strong><p>指や手のひらがネックへ重なり、ギター境界が途中で消える。</p></div>
+          <div><span>02</span><strong>腕と接触する</strong><p>腕がボディ前面を横切り、肌とギターの境界が近づく。</p></div>
+          <div><span>03</span><strong>袖が触れる</strong><p>長袖とギターが接触し、色や形だけでは分離しにくくなる。</p></div>
+          <div><span>04</span><strong>ギターがいない</strong><p>人だけ・背景だけの場面でFalse Positiveが出る条件も確認する。</p></div>
+        </div>
+
+        <p>
+          このやり方だと、Datasetを作る基準が「いろいろな写真を集める」から、
+          <strong>「現在のモデルが間違える分布を埋める」</strong>へ変わります。
+        </p>
+
+        <aside class="note-box">
+          <strong>Hard Caseは固定されたカテゴリではない</strong>
+          <p>
+            モデルが改善すれば、次に目立つ失敗条件も変わります。
+            そのため、Hard Caseは最初に一度決めて終わりではなく、推論結果を見ながら更新していく対象として扱っています。
+          </p>
+        </aside>
+
+        <h2>1枚ずつMaskをゼロから塗るのは重い</h2>
+
+        <p>
+          実写データを増やすには、画像だけでなく正解Maskも必要です。
+          1,000枚以上を毎回ゼロから手で塗るのは、個人開発ではかなり重い作業になります。
+        </p>
+
+        <p>
+          そこで、Mask作成にはSAM3を補助として使いました。
+          SAM3に候補Maskを作らせ、その結果を人が確認し、必要なところを修正してGround Truthにします。
+        </p>
+
+        <figure class="media">
+          <img
+            src="/images/guitar-ai/article-01/02_sam3_label_pipeline.webp"
+            alt="SAM3でギターMask候補を作り、人が確認修正して教師データにする工程"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            SAM3の出力をそのまま教師データにはせず、候補Maskとして利用し、最後は人が確認・修正する。
+          </figcaption>
+        </figure>
+
+        <p>
+          この方法で追加したHard-case画像は全体で1,918枚です。
+          そのうち<strong>1,235枚を学習用</strong>へ入れ、<strong>683枚をHard-case validation</strong>として分けました。
+        </p>
+
+        <div class="split-card">
+          <div><span>TRAIN</span><strong>1,235</strong><p>Real633へ追加し、Real1868を作る。</p></div>
+          <div><span>HARD VAL</span><strong>683</strong><p>学習には入れず、難しい条件での比較に使う。</p></div>
+        </div>
+
+        <h2>Real 633 → 1,868で、Hard Case性能が大きく変わった</h2>
+
+        <p>
+          同じHard Val 683枚で比較すると、Real633で学習した条件と、Hard Caseを加えたReal1868ではかなり差が出ました。
+        </p>
+
+        <div class="metrics">
+          <div>
+            <span>Hard Val IoU</span>
+            <strong>0.2300 → 0.4868</strong>
+            <small>+0.2568</small>
+          </div>
+          <div>
+            <span>BF1@2</span>
+            <strong>0.1874 → 0.4529</strong>
+            <small>+0.2655</small>
+          </div>
+        </div>
+
+        <figure class="media">
+          <img
+            src="/images/guitar-ai/article-01/04_hardcase_633_vs_1868.webp"
+            alt="Real633とReal1868のHard-case validation性能比較"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            Hard Val 683枚で、IoUは0.2300→0.4868、BF1@2は0.1874→0.4529へ改善した。
+          </figcaption>
+        </figure>
+
+        <p>
+          IoUだけでなくBF1@2も大きく上がっているので、
+          ギター領域を大まかに見つけるだけでなく、難しい条件での境界も改善しています。
+        </p>
+
+        <p>
+          この結果だけから「Hard Exampleを増やせばどんなSegmentationでも必ず改善する」とは言えません。
+          また、追加した各条件のうちどれが何ポイント効いたのかも、この比較だけでは分かりません。
+        </p>
+
+        <p>
+          ただ、今回のGuitar AIでは、
+          <strong>現在の失敗条件を観察し、その条件を狙ってDatasetへ戻す</strong>というループがかなり有効でした。
+        </p>
+
+        <h2>モデルを複雑にする前に、Datasetを疑う価値があった</h2>
+
+        <p>
+          AI開発をしていると、精度が伸びないときに新しいArchitectureやLossへ目が向きます。
+          もちろんモデル側の改善も必要です。
+        </p>
+
+        <p>
+          でも今回のように、失敗が特定の条件へ偏っているなら、
+          その条件が学習データに十分存在しているかを見る方が先かもしれません。
+        </p>
+
+        <div class="reasoning-flow">
+          <span>推論する</span><b>→</b><span>失敗を見る</span><b>→</b><span>条件を集める</span><b>→</b><span>再学習する</span>
+        </div>
+
+        <p>
+          Datasetを一度作って固定するのではなく、
+          <strong>モデルの失敗を次のデータ収集指示に使う</strong>という考え方に変わったのが、今回いちばん大きな変化でした。
+        </p>
+
+        <h2>それでも、長袖はまだ難しい</h2>
+
+        <p>
+          Hard Caseを増やしても、すべて解決したわけではありません。
+          現在も特に難しいのが、長袖、腕、手、ギターが密着する境界です。
+        </p>
+
+        <figure class="media">
+          <img
+            src="/images/guitar-ai/article-01/07_remaining_failure.webp"
+            alt="長袖や腕とギターの接触境界で残っているセグメンテーション失敗例"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            改善後にも残る失敗例。長袖・手・腕とギターが接触する条件は、引き続き重点的に見ています。
+          </figcaption>
+        </figure>
+
+        <p>
+          ここは今後も、失敗条件を分けながらReal Dataを追加していく必要があります。
+        </p>
+
+        <h2>次は、RealとSyntheticを混ぜる</h2>
+
+        <p>
+          第二号ではSynthetic Dataを5,000枚作り、今回はReal DataのHard Caseを増やしました。
+          次に試したのは、この2つをどう組み合わせるかです。
+        </p>
+
+        <p>
+          Real1868へSynthetic positive 623枚を追加した条件をSYN25と呼んでいます。
+          Hard Val 683では、さらに<strong>IoU 0.6249、BF1@2 0.6127</strong>まで伸びました。
+        </p>
+
+        <p>
+          ただし、Syntheticを大量に入れればいいわけではありません。
+          RealとSyntheticをどういう比率・役割で混ぜるかは別の問題でした。
+        </p>
+
+        <aside class="note-box">
+          <strong>次の記事へ</strong>
+          <p>
+            Synthetic Dataは大量に作れる。一方で実写とのDomain Gapがある。
+            次はReal1868を基準に、Syntheticを補助として混ぜたとき何が変わったかをまとめます。
+          </p>
+        </aside>
+
+        <nav class="article-nav" aria-label="関連記事">
+          <a href="/articles/synthetic-guitar-dataset">
+            <span>← 第二号</span>
+            <strong>AIの学習データが足りないので、自分のギターを5,000枚に増やした</strong>
+          </a>
+          <a href="/articles/virtual-guitar-ai">
+            <span>第一号</span>
+            <strong>Virtualな演奏動画を作りたくて、ギターを切り抜くAIを作っている</strong>
+          </a>
+          <a href="/projects/guitar-ai">
+            <span>Project</span>
+            <strong>Guitar AIを見る →</strong>
+          </a>
+        </nav>
+      </div>
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  main { width: min(var(--content-wide), calc(100% - 40px)); margin: 0 auto; }
+  .article-header { padding: 78px 0 48px; }
+  .back { display: inline-block; margin-bottom: 64px; color: var(--text-muted); font-size: .82rem; }
+  .back:hover { color: var(--accent); }
+  .eyebrow { margin: 0 0 20px; color: var(--accent); font-size: .72rem; font-weight: 800; letter-spacing: .18em; }
+  h1 { max-width: 1050px; margin: 0; font-size: clamp(2.6rem, 6.2vw, 5.5rem); line-height: 1.06; letter-spacing: -.055em; text-wrap: balance; word-break: auto-phrase; }
+  h1 span { display: block; }
+  .lead { max-width: 760px; margin: 30px 0 0; color: var(--text-muted); font-size: clamp(1.05rem, 2.1vw, 1.35rem); line-height: 1.85; }
+  .meta { display: flex; gap: 18px; margin-top: 28px; color: var(--text-subtle); font-size: .76rem; }
+  .hero-media { margin: 64px 0 0; }
+  .hero-media img, .media img { display: block; width: 100%; border-radius: 18px; }
+  .prose { max-width: 780px; margin: 0 auto; padding: 40px 0 120px; }
+  .prose > p { margin: 1.45rem 0; font-size: 1.04rem; line-height: 2; }
+  h2 { margin: 5.4rem 0 1.5rem; font-size: clamp(2rem, 4.6vw, 3.65rem); line-height: 1.16; letter-spacing: -.045em; text-wrap: balance; }
+  blockquote { margin: 2.8rem 0; padding: 24px 28px; border-left: 3px solid var(--accent); background: var(--accent-soft); font-size: clamp(1.1rem, 2vw, 1.3rem); font-weight: 750; line-height: 1.75; }
+  .media { width: min(980px, calc(100vw - 40px)); margin: 3.2rem 0 3.2rem 50%; transform: translateX(-50%); }
+  figcaption { margin-top: 12px; color: var(--text-subtle); font-size: .78rem; line-height: 1.7; }
+  .dataset-flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 12px; align-items: center; margin: 3rem 0; }
+  .dataset-flow > div { padding: 24px 18px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); text-align: center; }
+  .dataset-flow > div.emphasis { border-color: #b8d7c3; background: var(--accent-soft); }
+  .dataset-flow span, .split-card span { display: block; color: var(--accent); font-size: .68rem; font-weight: 800; letter-spacing: .12em; }
+  .dataset-flow strong, .split-card strong { display: block; margin: 6px 0 4px; font-size: 2.1rem; letter-spacing: -.04em; }
+  .dataset-flow small { color: var(--text-subtle); }
+  .dataset-flow > b { color: var(--text-subtle); }
+  .failure-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 3rem 0; }
+  .failure-grid > div { padding: 24px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+  .failure-grid span { color: var(--accent); font-size: .7rem; font-weight: 850; }
+  .failure-grid strong { display: block; margin: 8px 0 10px; font-size: 1.16rem; }
+  .failure-grid p { margin: 0; color: var(--text-muted); line-height: 1.75; }
+  .note-box { margin: 3rem 0; padding: 26px 28px; border: 1px solid #cfe1d4; border-radius: 16px; background: var(--accent-soft); }
+  .note-box strong { color: var(--accent); }
+  .note-box p { margin: 10px 0 0; color: var(--text-muted); line-height: 1.8; }
+  .split-card { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 3rem 0; }
+  .split-card > div { padding: 26px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+  .split-card p { margin: 8px 0 0; color: var(--text-muted); line-height: 1.7; }
+  .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 3rem 0; }
+  .metrics > div { padding: 28px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
+  .metrics span { display: block; margin-bottom: 8px; color: var(--text-subtle); font-size: .76rem; }
+  .metrics strong { display: block; font-size: clamp(1.55rem, 3vw, 2.2rem); letter-spacing: -.04em; }
+  .metrics small { display: block; margin-top: 8px; color: var(--accent); font-weight: 800; }
+  .reasoning-flow { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 13px; margin: 3rem 0; padding: 24px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
+  .reasoning-flow span { padding: 10px 14px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: .9rem; font-weight: 750; }
+  .reasoning-flow b { color: var(--text-subtle); }
+  .article-nav { display: grid; grid-template-columns: 1fr 1fr .65fr; gap: 14px; margin-top: 5rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+  .article-nav a { padding: 20px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+  .article-nav a:hover { border-color: var(--border-strong); box-shadow: var(--shadow-soft); }
+  .article-nav span { display: block; margin-bottom: 8px; color: var(--accent); font-size: .72rem; font-weight: 700; }
+  .article-nav strong { display: block; font-size: .9rem; line-height: 1.55; }
+
+  @media (max-width: 700px) {
+    .article-header { padding-top: 42px; }
+    .back { margin-bottom: 50px; }
+    h1 span { display: inline; }
+    h1 span + span::before { content: " "; }
+    .media { width: 100%; margin-left: 0; transform: none; }
+    .dataset-flow { grid-template-columns: 1fr; }
+    .dataset-flow > b { text-align: center; }
+    .failure-grid, .split-card, .metrics, .article-nav { grid-template-columns: 1fr; }
+  }
+</style>
