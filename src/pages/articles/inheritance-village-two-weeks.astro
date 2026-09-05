@@ -3,7 +3,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const title = "コンペのために、Codexと2週間でLLMの村を作った";
 const description =
-  "食料採取だけの小さな村から、感情日記、世代継承、ダンジョン、戦闘、自己地図まで。コンペ提出までの約2週間に起きたことを振り返ります。";
+  "ローカルLLMで4人の村人を動かすマルチエージェントシミュレーションを2週間で開発。食料採取、感情日記、世代継承、ダンジョン、戦闘までの実装と失敗を振り返ります。";
 const repoUrl = "https://github.com/tattoqq9/inheritance-village";
 const replayGif = "https://raw.githubusercontent.com/tattoqq9/inheritance-village/main/docs/assets/qwen36_27b_g11_replay.gif";
 const depositImage = "https://raw.githubusercontent.com/tattoqq9/inheritance-village/main/docs/assets/latest_clean_start_g2_material_deposit.png";
@@ -11,6 +11,7 @@ const depositImage = "https://raw.githubusercontent.com/tattoqq9/inheritance-vil
 
 <BaseLayout
   title={`${title} | TATTO LAB`}
+  seoTitle="LLMマルチエージェントシミュレーションを2週間で作った記録 | TATTO LAB"
   description={description}
   type="article"
   headline={title}
@@ -434,6 +435,7 @@ const depositImage = "https://raw.githubusercontent.com/tattoqq9/inheritance-vil
           <p class="eyebrow">TATTO LAB / INHERITANCE VILLAGE</p>
           <p>現在のシステム、結果、提出資料、GitHubはProjectページにまとめています。</p>
           <div class="end-links">
+            <a href="/articles/inheritance-village-python-authority">LLMとPythonの責任分界をどう設計したか →</a>
             <a href="/projects/agent-society">Inheritance Village Projectを見る →</a>
             <a href={repoUrl} target="_blank" rel="noreferrer">GitHub repository ↗</a>
           </div>
