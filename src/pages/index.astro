@@ -3,6 +3,12 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
 const projects = [
   {
+    title: "English Shift",
+    description: "接客シーンで「見分ける → 作る → 弱点を直す」を繰り返す英語学習ゲーム。Public Beta公開中。",
+    status: "Public Beta · Sep 2026",
+    href: "/projects/english-shift",
+  },
+  {
     title: "Guitar AI",
     description: "自分のギターを高精度に切り抜くための専用AIを開発しています。",
     status: "In Development",
@@ -80,19 +86,19 @@ const projects = [
         <a href="/articles">すべて見る →</a>
       </div>
 
-      <a class="article-preview" href="/articles/guitar-hard-cases">
+      <a class="article-preview" href="/articles/guitar-real-synthetic-mix">
         <div class="article-thumb">
           <img
-            src="/images/guitar-ai/article-01/04_hardcase_633_vs_1868.webp"
-            alt="Real633とReal1868のHard-case validation性能比較"
+            src="/images/guitar-ai/article-01/06_final_real_vs_syn25.webp"
+            alt="Real-onlyとSYN25の実演奏ギターセグメンテーション比較"
             width="1600"
             height="900"
           />
         </div>
         <div class="article-copy">
-          <p class="article-meta">GUITAR AI / HARD CASES / SEGMENTATION · 2026.09.05</p>
-          <h3>AIが失敗する場面ばかり集めて学習させたら、かなり改善した</h3>
-          <p>失敗条件を狙ってHard Caseを追加。Real 633→1,868でHard Val 683のIoUが0.2300→0.4868へ改善しました。</p>
+          <p class="article-meta">GUITAR AI / SYNTHETIC DATA / SEGMENTATION · 2026.09.05</p>
+          <h3>Synthetic Dataを25%だけ混ぜたら、実写のギター切り抜きがさらに良くなった</h3>
+          <p>Real1,868枚へSynthetic positive 623枚を追加。SYN25がHard ValとFinal Playing corrected180でどう変わったかを比較します。</p>
           <strong>Read Article →</strong>
         </div>
       </a>

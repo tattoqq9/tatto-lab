@@ -276,14 +276,18 @@ const description =
         </p>
 
         <aside class="note-box">
-          <strong>次の記事へ</strong>
+          <strong>続き：Real + Synthetic</strong>
           <p>
             Synthetic Dataは大量に作れる。一方で実写とのDomain Gapがある。
-            次はReal1868を基準に、Syntheticを補助として混ぜたとき何が変わったかをまとめます。
+            第四号では、Real1868を基準にSyntheticを25%混ぜたSYN25を比較しています。
           </p>
         </aside>
 
         <nav class="article-nav" aria-label="関連記事">
+          <a href="/articles/guitar-real-synthetic-mix">
+            <span>第四号 →</span>
+            <strong>Synthetic Dataを25%だけ混ぜたら、実写のギター切り抜きがさらに良くなった</strong>
+          </a>
           <a href="/articles/synthetic-guitar-dataset">
             <span>← 第二号</span>
             <strong>AIの学習データが足りないので、自分のギターを5,000枚に増やした</strong>
@@ -346,7 +350,7 @@ const description =
   .reasoning-flow { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 13px; margin: 3rem 0; padding: 24px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
   .reasoning-flow span { padding: 10px 14px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: .9rem; font-weight: 750; }
   .reasoning-flow b { color: var(--text-subtle); }
-  .article-nav { display: grid; grid-template-columns: 1fr 1fr .65fr; gap: 14px; margin-top: 5rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+  .article-nav { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 5rem; padding-top: 2rem; border-top: 1px solid var(--border); }
   .article-nav a { padding: 20px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
   .article-nav a:hover { border-color: var(--border-strong); box-shadow: var(--shadow-soft); }
   .article-nav span { display: block; margin-bottom: 8px; color: var(--accent); font-size: .72rem; font-weight: 700; }

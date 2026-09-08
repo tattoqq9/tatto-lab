@@ -1,0 +1,118 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="English Shift | TATTO LAB"
+  description="接客シーンの中で、見分ける・作る・弱点を直すを繰り返して英文法を学ぶEnglish ShiftのPublic Beta。"
+>
+  <main>
+    <section class="hero">
+      <p class="eyebrow">ENGLISH LEARNING / GAME / WEB APP</p>
+      <h1>English Shift</h1>
+      <p class="hero-copy">見分ける。作る。<br />弱点を直す。</p>
+      <div class="status"><span></span>Public Beta · v0.7.0</div>
+      <div class="hero-actions">
+        <a class="primary" href="https://english-shift.tattoqq9.workers.dev/" target="_blank" rel="noreferrer">Public Betaを開く ↗</a>
+        <a class="secondary" href="https://github.com/tattoqq9/english-shift" target="_blank" rel="noreferrer">GitHub ↗</a>
+      </div>
+    </section>
+
+    <section class="content">
+      <p class="eyebrow">OVERVIEW</p>
+      <h2>英文法を、接客シーンの中で使う。</h2>
+      <p>English Shiftは、英文法を問題集のように一問ずつ解くだけではなく、接客シーンの中で実際に使いながら覚えることを目標に作っている英語学習ゲームです。</p>
+      <p>「選択肢なら分かるけれど、自分では英文を作れない」という状態を区別できるよう、SELECT / BUILD / REPAIRを別の能力として扱っています。</p>
+    </section>
+
+    <section class="content">
+      <p class="eyebrow">LEARNING LOOP</p>
+      <h2>見分ける → 作る → 直す。</h2>
+      <div class="loop">
+        <article><span>01</span><small>SELECT</small><h3>見分ける</h3><p>接客状況から、意味・文法・対応として適切な英語を判断します。</p></article>
+        <div class="arrow" aria-hidden="true">→</div>
+        <article><span>02</span><small>BUILD</small><h3>作る</h3><p>同じDayの文法を、語順を組み立てたり、キーボードから入力したりして産出します。</p></article>
+        <div class="arrow" aria-hidden="true">→</div>
+        <article><span>03</span><small>REVIEW / REPAIR</small><h3>弱点を直す</h3><p>SELECT / BUILD / REPAIRを分けて記録し、弱い能力を短く復習します。</p></article>
+      </div>
+    </section>
+
+    <section class="content">
+      <p class="eyebrow">FREE BUILD</p>
+      <h2>後半は、自分で英文を入力する。</h2>
+      <p>BUILD後半には、chunkを並べ替えるだけでなく、キーボードから自分で英文を入力するFree typingを導入しています。</p>
+      <p>長いManager handoffまで通常学習で全文入力にすると、英語産出よりタイピングや暗記の負荷が強くなります。</p>
+      <p>そこで144問を監査し、StandardではFree typingに向いた問題を自由入力、複雑な長文はSemi-guidedにしています。Challengeでは全BUILD問題をFree typingで試せます。</p>
+    </section>
+
+    <section class="content">
+      <p class="eyebrow">CURRENT PUBLIC BETA</p>
+      <h2>現在入っているもの。</h2>
+      <div class="metrics">
+        <div><strong>162</strong><span>SELECT Activities</span></div>
+        <div><strong>144</strong><span>BUILD Activities</span></div>
+        <div><strong>24</strong><span>REPAIR Activities</span></div>
+        <div><strong>96</strong><span>Grammar Concepts</span></div>
+      </div>
+      <div class="feature-grid">
+        <article><h3>Weakness Review</h3><p>SELECT / BUILD / REPAIRのどの能力が弱いかまで分けて復習します。</p></article>
+        <article><h3>Customer Book</h3><p>Shiftを進めながらRecurring Customerを集め、Storeごとの進行も確認できます。</p></article>
+        <article><h3>Game Feel</h3><p>店舗ごとのBGM、SE、Haptics、Shift Complete演出などを追加しています。</p></article>
+        <article><h3>Mobile First</h3><p>Android実機でSELECT / BUILD / Free typing / 保存復元まで確認しながら調整しています。</p></article>
+      </div>
+    </section>
+
+    <section class="content">
+      <p class="eyebrow">TARGET</p>
+      <h2>高校英文法から、大学受験・TOEICへ。</h2>
+      <p>主な対象は、大学受験を控える高校生とTOEIC学習者です。文法知識を「知っている」だけでなく、接客文脈で判断し、自分で作れる状態へつなげることを狙っています。</p>
+    </section>
+
+    <section class="cta">
+      <p class="eyebrow">PUBLIC BETA</p>
+      <h2>実際に触れる状態まで来ました。</h2>
+      <p>しばらくは大きな機能追加よりも、実際に使ってもらった結果を見ながら、問題文・採点・スマートフォンでの操作性を改善していきます。</p>
+      <div class="cta-actions">
+        <a class="primary" href="https://english-shift.tattoqq9.workers.dev/" target="_blank" rel="noreferrer">English Shiftを試す ↗</a>
+        <a class="secondary" href="https://github.com/tattoqq9/english-shift/issues/new?title=%5BPublic%20Beta%5D%20Feedback" target="_blank" rel="noreferrer">Feedback ↗</a>
+      </div>
+      <p class="saved-note">現在のPublic Betaでは、学習進捗は主に利用中のブラウザ内に保存されます。</p>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  main { width: min(var(--content-wide), calc(100% - 40px)); margin: 0 auto; }
+  section { padding: 100px 0; }
+  .hero { min-height: 620px; display: flex; flex-direction: column; justify-content: center; }
+  .eyebrow { margin: 0 0 18px; font-size: .72rem; font-weight: 800; letter-spacing: .18em; }
+  h1 { margin: 0; font-size: clamp(4rem, 11vw, 8.5rem); line-height: .92; letter-spacing: -.06em; }
+  .hero-copy { margin: 35px 0 24px; color: var(--text-muted); font-size: clamp(1.5rem, 3.5vw, 2.7rem); line-height: 1.45; letter-spacing: -.035em; }
+  .status { display: flex; align-items: center; gap: 9px; color: var(--text-muted); font-size: .82rem; }
+  .status span { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .hero-actions, .cta-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+  .primary, .secondary { display: inline-flex; align-items: center; justify-content: center; padding: 13px 20px; border-radius: 999px; font-size: .88rem; font-weight: 800; }
+  .primary { background: var(--text); color: #fff; }
+  .primary:hover { background: var(--accent); }
+  .secondary { border: 1px solid var(--border-strong); color: var(--text-muted); background: rgba(255,255,255,.58); }
+  .secondary:hover { color: var(--accent); border-color: var(--accent); }
+  .content { max-width: 920px; }
+  h2 { max-width: 830px; margin: 0 0 34px; font-size: clamp(2.4rem, 6vw, 5rem); line-height: 1.08; letter-spacing: -.05em; }
+  .content > p:not(.eyebrow), .cta > p:not(.eyebrow) { max-width: 780px; color: var(--text-muted); font-size: 1.05rem; line-height: 2; }
+  .loop { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 16px; align-items: stretch; }
+  .loop article, .feature-grid article { padding: 25px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
+  .loop article > span { color: var(--text-subtle); font-size: .72rem; }
+  .loop small { display: block; margin-top: 20px; color: var(--accent); font-size: .7rem; font-weight: 800; letter-spacing: .08em; }
+  .loop h3, .feature-grid h3 { margin: 8px 0 10px; font-size: 1.35rem; }
+  .loop p, .feature-grid p { margin: 0; color: var(--text-muted); line-height: 1.8; }
+  .arrow { display: grid; place-items: center; color: var(--text-subtle); font-size: 1.3rem; }
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+  .metrics div { padding: 26px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
+  .metrics strong { display: block; font-size: 2.35rem; letter-spacing: -.04em; }
+  .metrics span { color: var(--text-subtle); font-size: .76rem; }
+  .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .cta { margin: 40px 0 80px; padding: clamp(34px, 6vw, 70px); border: 1px solid var(--border); border-radius: 24px; background: linear-gradient(135deg, #eef4ef, #f8f4e9); }
+  .saved-note { margin-top: 24px; font-size: .84rem !important; color: var(--text-subtle) !important; }
+  @media (max-width: 760px) { .hero { min-height: 510px; } .loop { grid-template-columns: 1fr; } .arrow { transform: rotate(90deg); min-height: 28px; } .metrics, .feature-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) { .metrics, .feature-grid { grid-template-columns: 1fr; } }
+</style>

@@ -18,10 +18,11 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       <div class="demo-panel">
         <div>
           <p class="demo-kicker">LATEST ARTICLE</p>
-          <h2>失敗する場面ばかり集めて学習させた。</h2>
-          <p>モデルが苦手な条件を狙ってHard Caseを追加し、Real Dataを633枚から1,868枚へ。Hard Val 683でIoU 0.2300→0.4868、BF1@2 0.1874→0.4529まで改善した過程をまとめました。</p>
+          <h2>RealにSyntheticを25%混ぜた。</h2>
+          <p>Real1,868枚にSynthetic positive 623枚を加えたSYN25を検証。Hard Val 683ではIoU 0.6249、BF1@2 0.6127、Final Playing corrected180ではIoU 0.8322まで改善しました。</p>
           <div class="demo-links">
-            <a href="/articles/guitar-hard-cases">第三号記事を読む →</a>
+            <a href="/articles/guitar-real-synthetic-mix">第四号記事を読む →</a>
+            <a href="/articles/guitar-hard-cases">第三号：Hard Case →</a>
             <a href="/articles/synthetic-guitar-dataset">第二号：Synthetic Data 5,000枚 →</a>
             <a href="/articles/virtual-guitar-ai">第一号：Virtualな演奏動画へ →</a>
           </div>
@@ -82,6 +83,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       <h2>切り抜くことの先へ。</h2>
       <p>手・腕・長袖との接触境界をさらに改善しながら、MediaPipe Handsとの統合やリアルタイム化を進めます。</p>
       <div class="next-links">
+        <a href="/articles/guitar-real-synthetic-mix">第四号記事を読む →</a>
         <a href="/articles/guitar-hard-cases">第三号記事を読む →</a>
         <a href="/articles/synthetic-guitar-dataset">第二号記事を読む →</a>
         <a href="/articles/virtual-guitar-ai">第一号記事を読む →</a>

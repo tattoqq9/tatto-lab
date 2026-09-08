@@ -1,0 +1,382 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const title = "Synthetic Dataを25%だけ混ぜたら、実写のギター切り抜きがさらに良くなった";
+const description =
+  "Real 1,868枚を基準にSynthetic positive 623枚を加え、Synthetic比率25%のSYN25を検証。Hard Val 683とFinal Playing corrected180で、Real-onlyからどこまで改善したかをまとめます。";
+---
+
+<BaseLayout
+  title={`${title} | TATTO LAB`}
+  seoTitle="画像セグメンテーションでRealとSynthetic Dataを混ぜる｜SYN25実験 | TATTO LAB"
+  description={description}
+  type="article"
+  headline={title}
+  publishedTime="2026-09-05"
+  image="/images/guitar-ai/article-01/06_final_real_vs_syn25.webp"
+  imageAlt="Real-onlyとSynthetic Dataを25%混ぜたSYN25のギター画像セグメンテーション比較"
+>
+  <main>
+    <article>
+      <header class="article-header">
+        <a class="back" href="/articles">← Articles</a>
+        <p class="eyebrow">GUITAR AI / SYNTHETIC DATA / COMPUTER VISION</p>
+        <h1>
+          <span>Synthetic Dataを25%だけ混ぜたら、</span>
+          <span>実写のギター切り抜きがさらに良くなった</span>
+        </h1>
+        <p class="lead">
+          Syntheticだけでは足りなかった。でも、Realが強くなった後なら補助データとして効くかもしれない。
+        </p>
+        <div class="meta">
+          <time datetime="2026-09-05">2026.09.05</time>
+          <span>Research / Development</span>
+        </div>
+
+        <figure class="hero-media">
+          <img
+            src="/images/guitar-ai/article-01/06_final_real_vs_syn25.webp"
+            alt="Real-onlyとSYN25の実演奏ギターセグメンテーション比較"
+            width="1600"
+            height="900"
+          />
+        </figure>
+      </header>
+
+      <div class="prose">
+        <p>
+          第二号では、自分のギターからSynthetic Dataを5,000枚作りました。
+          でも、Syntheticだけで実際の演奏映像を完全にカバーするのは難しかった。
+        </p>
+
+        <p>
+          手がネックに重なる。腕がボディを横切る。袖がギターへ触れる。
+          こうした実写特有の条件は、背景合成だけでは十分に再現できません。
+        </p>
+
+        <p>
+          そこで第三号では、モデルが失敗するHard Caseを狙ってReal Dataを追加し、
+          <strong>633枚から1,868枚</strong>まで増やしました。
+        </p>
+
+        <blockquote>
+          Realが十分に強くなった状態なら、Syntheticは「代わり」ではなく「補助」として使えるのでは？
+        </blockquote>
+
+        <p>
+          今回は、その考えを試した条件<strong>SYN25</strong>についてまとめます。
+        </p>
+
+        <h2>5,000枚全部は入れなかった</h2>
+
+        <p>
+          手元にはSynthetic Datasetが5,000枚あります。
+          ただし今回のSYN25では、その全量を学習へ追加したわけではありません。
+        </p>
+
+        <p>
+          基準となるReal Dataは1,868枚。
+          そこへSyntheticの<strong>Positive Sampleを623枚</strong>だけ追加しました。
+        </p>
+
+        <div class="dataset-flow" aria-label="SYN25のDataset構成">
+          <div>
+            <span>REAL</span>
+            <strong>1,868</strong>
+            <small>75%</small>
+          </div>
+          <b>＋</b>
+          <div>
+            <span>SYNTHETIC POSITIVE</span>
+            <strong>623</strong>
+            <small>25%</small>
+          </div>
+          <b>＝</b>
+          <div class="emphasis">
+            <span>SYN25</span>
+            <strong>2,491</strong>
+            <small>training images</small>
+          </div>
+        </div>
+
+        <p>
+          623 ÷ 2,491 ≈ 25.0%なので、学習データ全体の約25%がSyntheticになる条件です。
+          そのため、この条件を<strong>SYN25</strong>と呼んでいます。
+        </p>
+
+        <aside class="note-box">
+          <strong>25%が最適だと証明したわけではない</strong>
+          <p>
+            今回確認できるのは、Real1868とSYN25を比較したときに性能が改善したことです。
+            この結果だけから「Syntheticは25%が最適」とは言えません。
+          </p>
+        </aside>
+
+        <h2>RealとSyntheticに、同じ役割を期待しない</h2>
+
+        <p>
+          この構成では、RealとSyntheticを同じ種類のデータとして考えていません。
+          設計上は、役割を少し分けて考えています。
+        </p>
+
+        <div class="role-grid">
+          <div>
+            <span>REAL DATA</span>
+            <strong>実写の接触条件</strong>
+            <p>手、腕、袖、ギターとの接触境界など、実際の演奏で起こる複雑な条件を持つ。</p>
+          </div>
+          <div>
+            <span>SYNTHETIC DATA</span>
+            <strong>ギター側の多様性</strong>
+            <p>背景、位置、角度、姿勢、スケールなどを増やしやすい。</p>
+          </div>
+        </div>
+
+        <p>
+          SyntheticだけでRealを置き換えるのではなく、
+          <strong>Realで実写の難しさを押さえた上で、Syntheticでギター側の変化を補う</strong>という考え方です。
+        </p>
+
+        <figure class="media">
+          <img
+            src="/images/guitar-ai/article-01/05_dataset_growth.webp"
+            alt="Real633からReal1868、さらにSYN25へDatasetを増やした流れ"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            Real633 → Hard Caseを加えたReal1868 → Synthetic positive 623枚を加えたSYN25という流れ。
+          </figcaption>
+        </figure>
+
+        <h2>Hard Valでは、さらに伸びた</h2>
+
+        <p>
+          まず、第三号と同じHard-case validation 683枚で比較します。
+        </p>
+
+        <div class="metrics">
+          <div>
+            <span>Hard Val IoU</span>
+            <strong>0.4868 → 0.6249</strong>
+            <small>+0.1381</small>
+          </div>
+          <div>
+            <span>Hard Val BF1@2</span>
+            <strong>0.4529 → 0.6127</strong>
+            <small>+0.1598</small>
+          </div>
+        </div>
+
+        <p>
+          Real1868だけでも、Real633と比べればかなり改善していました。
+          そこへSyntheticを補助的に加えたSYN25では、Hard ValのIoUと境界指標BF1@2がさらに上がりました。
+        </p>
+
+        <p>
+          少なくとも今回の条件では、
+          <strong>Hard Caseを集めたReal DataとSynthetic Dataは競合せず、追加した条件でさらに性能が伸びました。</strong>
+        </p>
+
+        <h2>難しいデータだけでなく、実際の演奏でも確認する</h2>
+
+        <p>
+          Hard Valだけで良くても、最終的に使いたい演奏映像で悪化してしまえば意味がありません。
+          そこで、正式なFinal Playing <strong>corrected180</strong>でもReal-onlyとSYN25を比較しました。
+        </p>
+
+        <figure class="media">
+          <img
+            src="/images/guitar-ai/article-01/06_final_real_vs_syn25.webp"
+            alt="Final Playing corrected180におけるReal-onlyとSYN25の比較"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            正式なFinal Playing corrected180でReal-onlyとSYN25を比較。SYN25ではギター領域と境界の両方が改善した。
+          </figcaption>
+        </figure>
+
+        <div class="final-table">
+          <div class="table-head"><span>Metric</span><span>Real-only</span><span>SYN25</span><span>Δ</span></div>
+          <div><span>IoU</span><strong>0.7852</strong><strong>0.8322</strong><em>+0.0470</em></div>
+          <div><span>Dice</span><strong>0.8782</strong><strong>0.9071</strong><em>+0.0289</em></div>
+          <div><span>Precision</span><strong>0.8959</strong><strong>0.8960</strong><em>+0.0001</em></div>
+          <div><span>Recall</span><strong>0.8677</strong><strong>0.9219</strong><em>+0.0542</em></div>
+          <div><span>BF1@2</span><strong>0.7807</strong><strong>0.8425</strong><em>+0.0618</em></div>
+        </div>
+
+        <p>
+          IoU、Dice、Recall、BF1@2はいずれも改善しました。
+          一方でPrecisionは<strong>0.8959 → 0.8960</strong>とほぼ変わっていません。
+        </p>
+
+        <p>
+          少なくともこのcorrected180では、
+          <strong>False Positiveを大きく増やさず、取りこぼしを減らした方向の改善</strong>が見えます。
+          Recallが0.8677から0.9219へ上がったことが、その傾向をよく表しています。
+        </p>
+
+        <h2>「Syntheticは駄目」ではなく、使う順番の問題だった</h2>
+
+        <p>
+          Synthetic Dataを最初に作ったときは、実写とのDomain Gapがかなり気になりました。
+          人がギターを持つ、手が重なる、服が触れる、といった条件は背景合成だけでは足りません。
+        </p>
+
+        <p>
+          そのため、Syntheticを増やせばそれだけで実演奏が解ける、という見方はしなくなりました。
+        </p>
+
+        <div class="reasoning-flow">
+          <span>Syntheticを作る</span><b>→</b><span>実写で失敗する</span><b>→</b><span>Real Hard Caseを増やす</span><b>→</b><span>Syntheticを補助で戻す</span>
+        </div>
+
+        <p>
+          今回うまくいったのは、
+          <strong>まずReal側で実写特有の問題を学習させ、その後にSyntheticを補助として混ぜた構成</strong>です。
+        </p>
+
+        <p>
+          これは「Synthetic Dataを作った5,000枚が無駄ではなかった」という意味でもありました。
+          最初の主役にはなれなくても、Real Dataが整った後に別の役割で使える可能性があります。
+        </p>
+
+        <h2>まだ残っている失敗はある</h2>
+
+        <p>
+          SYN25でもすべてのフレームを完全に切り抜けるわけではありません。
+          長袖、手、腕、ギターが密着する境界は引き続き難しい条件です。
+        </p>
+
+        <figure class="media">
+          <img
+            src="/images/guitar-ai/article-01/07_remaining_failure.webp"
+            alt="SYN25でも残る長袖や腕とギターの接触境界の失敗例"
+            loading="lazy"
+            width="1600"
+            height="900"
+          />
+          <figcaption>
+            現在も残る難しい条件。長袖、手、腕、ギターの接触境界は引き続き改善対象。
+          </figcaption>
+        </figure>
+
+        <p>
+          ここから先は、さらにReal Dataを増やすのか、モデル側を変えるのか、
+          あるいは両方をどう組み合わせるかを切り分けていく必要があります。
+        </p>
+
+        <h2>ここまでで、Datasetの作り方が一周した</h2>
+
+        <p>
+          最初は「データが足りないからSyntheticを大量に作る」から始まりました。
+          その後、実写で失敗し、Hard Caseを集め、最後にSyntheticを補助として戻しました。
+        </p>
+
+        <div class="series-flow">
+          <a href="/articles/synthetic-guitar-dataset"><span>第二号</span><strong>Synthetic 5,000枚</strong></a>
+          <b>→</b>
+          <a href="/articles/guitar-hard-cases"><span>第三号</span><strong>Real Hard Case</strong></a>
+          <b>→</b>
+          <div><span>第四号</span><strong>Real + Synthetic</strong></div>
+        </div>
+
+        <p>
+          Datasetは、一度作って終わるものではありませんでした。
+          実際の失敗を見ながら、RealとSyntheticの役割を変えていく。
+          今回の一連の実験で、そこがかなりはっきりしました。
+        </p>
+
+        <nav class="article-nav" aria-label="関連記事">
+          <a href="/articles/guitar-hard-cases">
+            <span>← 第三号</span>
+            <strong>AIが失敗する場面ばかり集めて学習させたら、かなり改善した</strong>
+          </a>
+          <a href="/articles/synthetic-guitar-dataset">
+            <span>第二号</span>
+            <strong>AIの学習データが足りないので、自分のギターを5,000枚に増やした</strong>
+          </a>
+          <a href="/projects/guitar-ai">
+            <span>Project</span>
+            <strong>Guitar AIを見る →</strong>
+          </a>
+        </nav>
+      </div>
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  main { width: min(var(--content-wide), calc(100% - 40px)); margin: 0 auto; }
+  .article-header { padding: 78px 0 48px; }
+  .back { display: inline-block; margin-bottom: 64px; color: var(--text-muted); font-size: .82rem; }
+  .back:hover { color: var(--accent); }
+  .eyebrow { margin: 0 0 20px; color: var(--accent); font-size: .72rem; font-weight: 800; letter-spacing: .18em; }
+  h1 { max-width: 1080px; margin: 0; font-size: clamp(2.6rem, 6.2vw, 5.5rem); line-height: 1.06; letter-spacing: -.055em; text-wrap: balance; word-break: auto-phrase; }
+  h1 span { display: block; }
+  .lead { max-width: 780px; margin: 30px 0 0; color: var(--text-muted); font-size: clamp(1.05rem, 2.1vw, 1.35rem); line-height: 1.85; }
+  .meta { display: flex; gap: 18px; margin-top: 28px; color: var(--text-subtle); font-size: .76rem; }
+  .hero-media { margin: 64px 0 0; }
+  .hero-media img, .media img { display: block; width: 100%; border-radius: 18px; }
+  .prose { max-width: 780px; margin: 0 auto; padding: 40px 0 120px; }
+  .prose > p { margin: 1.45rem 0; font-size: 1.04rem; line-height: 2; }
+  h2 { margin: 5.4rem 0 1.5rem; font-size: clamp(2rem, 4.6vw, 3.65rem); line-height: 1.16; letter-spacing: -.045em; text-wrap: balance; }
+  blockquote { margin: 2.8rem 0; padding: 24px 28px; border-left: 3px solid var(--accent); background: var(--accent-soft); font-size: clamp(1.1rem, 2vw, 1.3rem); font-weight: 750; line-height: 1.75; }
+  .media { width: min(980px, calc(100vw - 40px)); margin: 3.2rem 0 3.2rem 50%; transform: translateX(-50%); }
+  figcaption { margin-top: 12px; color: var(--text-subtle); font-size: .78rem; line-height: 1.7; }
+  .dataset-flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 12px; align-items: center; margin: 3rem 0; }
+  .dataset-flow > div { padding: 24px 18px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); text-align: center; }
+  .dataset-flow > div.emphasis { border-color: #b8d7c3; background: var(--accent-soft); }
+  .dataset-flow span, .series-flow span { display: block; color: var(--accent); font-size: .68rem; font-weight: 800; letter-spacing: .12em; }
+  .dataset-flow strong { display: block; margin: 6px 0 4px; font-size: 2.1rem; letter-spacing: -.04em; }
+  .dataset-flow small { color: var(--text-subtle); }
+  .dataset-flow > b { color: var(--text-subtle); }
+  .note-box { margin: 3rem 0; padding: 26px 28px; border: 1px solid #cfe1d4; border-radius: 16px; background: var(--accent-soft); }
+  .note-box strong { color: var(--accent); }
+  .note-box p { margin: 10px 0 0; color: var(--text-muted); line-height: 1.8; }
+  .role-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 3rem 0; }
+  .role-grid > div { padding: 26px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+  .role-grid span { color: var(--accent); font-size: .7rem; font-weight: 850; letter-spacing: .08em; }
+  .role-grid strong { display: block; margin: 8px 0 10px; font-size: 1.18rem; }
+  .role-grid p { margin: 0; color: var(--text-muted); line-height: 1.75; }
+  .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 3rem 0; }
+  .metrics > div { padding: 28px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
+  .metrics span { display: block; margin-bottom: 8px; color: var(--text-subtle); font-size: .76rem; }
+  .metrics strong { display: block; font-size: clamp(1.55rem, 3vw, 2.2rem); letter-spacing: -.04em; }
+  .metrics small { display: block; margin-top: 8px; color: var(--accent); font-weight: 800; }
+  .final-table { margin: 3rem 0; overflow: hidden; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
+  .final-table > div { display: grid; grid-template-columns: 1.2fr 1fr 1fr .8fr; gap: 12px; align-items: center; padding: 16px 20px; border-top: 1px solid var(--border); }
+  .final-table > div:first-child { border-top: 0; }
+  .final-table .table-head { background: var(--accent-soft); color: var(--accent); font-size: .72rem; font-weight: 800; letter-spacing: .08em; }
+  .final-table strong { font-size: .95rem; }
+  .final-table em { color: var(--accent); font-style: normal; font-weight: 800; }
+  .reasoning-flow { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 13px; margin: 3rem 0; padding: 24px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
+  .reasoning-flow span { padding: 10px 14px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: .9rem; font-weight: 750; }
+  .reasoning-flow b { color: var(--text-subtle); }
+  .series-flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 10px; align-items: center; margin: 3rem 0; }
+  .series-flow a, .series-flow > div { padding: 20px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); text-align: center; }
+  .series-flow a:hover { border-color: var(--border-strong); box-shadow: var(--shadow-soft); }
+  .series-flow strong { display: block; margin-top: 7px; font-size: .92rem; line-height: 1.5; }
+  .series-flow > b { color: var(--text-subtle); text-align: center; }
+  .article-nav { display: grid; grid-template-columns: 1fr 1fr .65fr; gap: 14px; margin-top: 5rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+  .article-nav a { padding: 20px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+  .article-nav a:hover { border-color: var(--border-strong); box-shadow: var(--shadow-soft); }
+  .article-nav span { display: block; margin-bottom: 8px; color: var(--accent); font-size: .72rem; font-weight: 700; }
+  .article-nav strong { display: block; font-size: .9rem; line-height: 1.55; }
+
+  @media (max-width: 700px) {
+    .article-header { padding-top: 42px; }
+    .back { margin-bottom: 50px; }
+    h1 span { display: inline; }
+    h1 span + span::before { content: " "; }
+    .media { width: 100%; margin-left: 0; transform: none; }
+    .dataset-flow, .series-flow { grid-template-columns: 1fr; }
+    .dataset-flow > b, .series-flow > b { text-align: center; }
+    .role-grid, .metrics, .article-nav { grid-template-columns: 1fr; }
+    .final-table { overflow-x: auto; }
+    .final-table > div { min-width: 600px; }
+  }
+</style>
