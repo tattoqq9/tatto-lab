@@ -1,0 +1,77 @@
+---
+import "../styles/global.css";
+
+interface Props { lang: "ja" | "en"; }
+const { lang } = Astro.props;
+const japanese = lang === "ja";
+const title = japanese ? "KABURIO プライバシーポリシー" : "KABURIO Privacy Policy";
+const description = japanese
+  ? "KABURIOにおける写真・動画の端末内処理、広告配信、情報の保存と削除について。"
+  : "How KABURIO handles on-device photos and videos, advertising, storage, and deletion.";
+const jaUrl = new URL("/kaburio/privacy/", Astro.site ?? "https://tatto-lab.pages.dev");
+const enUrl = new URL("/kaburio/privacy/en/", Astro.site ?? "https://tatto-lab.pages.dev");
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f7f8f6" />
+    <title>{title} | TATTO LAB</title>
+    <link rel="canonical" href={japanese ? jaUrl : enUrl} />
+    <link rel="alternate" hreflang="ja" href={jaUrl} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="x-default" href={jaUrl} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate icon" href="/favicon.ico" />
+  </head>
+  <body>
+    <a class="skip-link" href="#policy">{japanese ? "本文へ移動" : "Skip to content"}</a>
+    <header class="site-header">
+      <a class="site-logo" href="/">
+        <strong>TATTO LAB</strong>
+        <span lang="ja">たっと研究室</span>
+      </a>
+      <nav class="language-switch" aria-label={japanese ? "言語" : "Language"}>
+        <a href="/kaburio/privacy/" lang="ja" hreflang="ja" aria-current={japanese ? "page" : undefined}>日本語</a>
+        <a href="/kaburio/privacy/en/" lang="en" hreflang="en" aria-current={!japanese ? "page" : undefined}>English</a>
+      </nav>
+    </header>
+    <main id="policy" tabindex="-1">
+      <p class="eyebrow">KABURIO</p>
+      <h1>{title}</h1>
+      <p class="updated">{japanese ? "最終更新日：" : "Last updated: "}<time datetime="2026-10-22">{japanese ? "2026年10月22日" : "October 22, 2026"}</time></p>
+      <article class="policy-content" aria-label={title}><slot /></article>
+    </main>
+    <footer class="site-footer">
+      <a href="/">TATTO LAB</a>
+      <a href="mailto:tattoqq9@gmail.com">{japanese ? "お問い合わせ" : "Contact"}</a>
+      <span>© 2026 TATTO LAB</span>
+    </footer>
+  </body>
+</html>
+<style>
+  main { width: min(760px, calc(100% - 40px)); margin: auto; padding: 64px 0 0; }
+  .eyebrow { font-size: .8rem; font-weight: 800; letter-spacing: .15em; margin: 0 0 12px; }
+  h1 { font-size: clamp(1.75rem, 5vw, 2.8rem); line-height: 1.35; margin: 0 0 16px; overflow-wrap: anywhere; }
+  .updated { color: var(--text-muted); font-size: .9rem; margin: 0 0 40px; }
+  .language-switch { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .language-switch a { min-height: 44px; display: inline-flex; align-items: center; padding: 8px 12px; border-radius: 8px; font-size: .9rem; }
+  .language-switch a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+  .policy-content :global(section) { margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--border); }
+  .policy-content :global(h2) { font-size: 1.2rem; line-height: 1.6; margin: 0 0 16px; }
+  .policy-content :global(p) { line-height: 1.95; margin: 0 0 16px; overflow-wrap: anywhere; }
+  .policy-content :global(a) { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+  .site-footer { margin-top: 64px; flex-wrap: wrap; gap: 12px 24px; }
+  .site-footer a { text-decoration: underline; text-underline-offset: 3px; }
+  a:focus-visible, .policy-content :global(a:focus-visible) { outline: 3px solid var(--accent); outline-offset: 4px; border-radius: 3px; }
+  .skip-link { position: absolute; left: 16px; top: -100px; padding: 12px; background: var(--surface); z-index: 10; }
+  .skip-link:focus { top: 12px; }
+  @media (max-width: 480px) {
+    main { padding-top: 40px; }
+    .language-switch a { padding-inline: 9px; }
+    .policy-content :global(section) { margin-top: 28px; padding-top: 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) { :global(html) { scroll-behavior: auto; } }
+</style>
