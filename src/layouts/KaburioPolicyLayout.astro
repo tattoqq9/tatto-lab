@@ -1,15 +1,18 @@
 ---
 import "../styles/global.css";
 
-interface Props { lang: "ja" | "en"; }
-const { lang } = Astro.props;
+interface Props { lang: "ja" | "en"; legacy?: boolean; }
+const { lang, legacy = false } = Astro.props;
 const japanese = lang === "ja";
-const title = japanese ? "KABURIO プライバシーポリシー" : "KABURIO Privacy Policy";
+const title = japanese
+  ? (legacy ? "KABURIO 旧広告版プライバシーポリシー" : "KABURIO プライバシーポリシー")
+  : (legacy ? "KABURIO Legacy Advertising Policy" : "KABURIO Privacy Policy");
 const description = japanese
-  ? "KABURIOにおける写真・動画の端末内処理、広告配信、情報の保存と削除について。"
-  : "How KABURIO handles on-device photos and videos, advertising, storage, and deletion.";
-const jaUrl = new URL("/kaburio/privacy/", Astro.site ?? "https://tatto-lab.pages.dev");
-const enUrl = new URL("/kaburio/privacy/en/", Astro.site ?? "https://tatto-lab.pages.dev");
+  ? (legacy ? "KABURIO旧広告版の情報の取り扱い。" : "広告なし版KABURIOにおける端末内処理、情報の保存と削除について。")
+  : (legacy ? "Information handling in earlier KABURIO builds with advertising." : "How ad-free KABURIO handles local processing, storage, and deletion.");
+const policyBase = legacy ? "/kaburio/privacy/legacy-ads/" : "/kaburio/privacy/";
+const jaUrl = new URL(policyBase, Astro.site ?? "https://tatto-lab.pages.dev");
+const enUrl = new URL(policyBase + "en/", Astro.site ?? "https://tatto-lab.pages.dev");
 ---
 <!doctype html>
 <html lang={lang}>
@@ -34,14 +37,14 @@ const enUrl = new URL("/kaburio/privacy/en/", Astro.site ?? "https://tatto-lab.p
         <span lang="ja">たっと研究室</span>
       </a>
       <nav class="language-switch" aria-label={japanese ? "言語" : "Language"}>
-        <a href="/kaburio/privacy/" lang="ja" hreflang="ja" aria-current={japanese ? "page" : undefined}>日本語</a>
-        <a href="/kaburio/privacy/en/" lang="en" hreflang="en" aria-current={!japanese ? "page" : undefined}>English</a>
+        <a href={jaUrl} lang="ja" hreflang="ja" aria-current={japanese ? "page" : undefined}>日本語</a>
+        <a href={enUrl} lang="en" hreflang="en" aria-current={!japanese ? "page" : undefined}>English</a>
       </nav>
     </header>
     <main id="policy" tabindex="-1">
       <p class="eyebrow">KABURIO</p>
       <h1>{title}</h1>
-      <p class="updated">{japanese ? "最終更新日：" : "Last updated: "}<time datetime="2026-10-22">{japanese ? "2026年10月22日" : "October 22, 2026"}</time></p>
+      <p class="updated">{japanese ? "最終更新日：" : "Last updated: "}<time datetime={legacy ? "2026-10-22" : "2026-10-28"}>{japanese ? (legacy ? "2026年10月22日" : "2026年10月28日") : (legacy ? "October 22, 2026" : "October 28, 2026")}</time></p>
       <article class="policy-content" aria-label={title}><slot /></article>
     </main>
     <footer class="site-footer">
